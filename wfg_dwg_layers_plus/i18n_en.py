@@ -578,4 +578,34 @@ EN = {
         'polygons',
     'Anuluj':
         'Cancel',
+    'Dodaj warstwę DWG/DXF+…':
+        'Add DWG/DXF+ Layer…',
+    'Importuj DWG/DXF jako warstwy':
+        'Import DWG/DXF as layers',
+    'Każda warstwa CAD staje się osobną warstwą QGIS „<warstwa_CAD>_<typ>” w czterech grupach wg typu geometrii. Źródło: DXF albo DWG (własny import przez GDAL; DWG wymaga ODA File Converter albo LibreDWG) albo GeoPackage z wbudowanego importu QGIS. Bloki złożone i punkty wstawień tylko dla GeoPackage z wbudowanego importu bez rozwijania bloków.':
+        'Every CAD layer becomes a separate QGIS layer "<cad_layer>_<type>" in four groups by geometry type. Source: DXF or DWG (own import via GDAL; DWG requires ODA File Converter or LibreDWG) or a GeoPackage from the built-in QGIS import. Composite blocks and insert points only for a GeoPackage from the built-in import without expanding blocks.',
+    'Odzyskaj warstwy z rysunku':
+        'Recover layers from the drawing',
+    'Napraw kodowanie':
+        'Fix encoding',
+    'Wczytaj atrybuty bloków z rysunku':
+        'Load block attributes from the drawing',
+    'Rysunek DXF może zostać pusty: wtyczka weźmie ścieżkę zapisaną przez import w GeoPackage.':
+        'The DXF drawing may be left empty: the plugin takes the path stored in the GeoPackage by the import.',
+    'Wyjściowy GeoPackage (domyślnie obok pliku źródłowego)':
+        'Output GeoPackage (default: next to the source file)',
+    'GeoPackage':
+        'GeoPackage',
+    'Liczba warstw':
+        'Number of layers',
+    'Punkty wstawień i bloki złożone wymagają GeoPackage z wbudowanego importu QGIS bez rozwijania bloków (Projekt > Importuj/Eksportuj > Importuj warstwy z DWG/DXF). Własny import DXF rozwija bloki.':
+        'Insert points and composite blocks require a GeoPackage from the built-in QGIS import without expanding blocks (Project > Import/Export > Import Layers from DWG/DXF). The own DXF import expands blocks.',
+    'Poprawione obiekty':
+        'Features fixed',
+    'Kopia zapasowa':
+        'Backup',
+    'Poprawione wartości':
+        'Values fixed',
+    'Zapisane wiersze':
+        'Rows written',
 }

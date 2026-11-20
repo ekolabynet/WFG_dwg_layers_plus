@@ -31,6 +31,13 @@ Menu *Vector → WFG DWG Layers+*:
 | Recover layers from the drawing… | heavy POLYLINE that landed on layer 0: the layer is rewritten from the DXF by handle, geometry untouched |
 | Split layer by colour… | drawings that really keep everything on layer 0 and separate content by colour, pen weight or entity type |
 
+Also in *Layer → Add Layer → Add DWG/DXF+ Layer…* (and on the Manage Layers toolbar), next to the other data sources.
+
+**Processing Toolbox** (provider *WFG DWG Layers+*, for models and batch runs): *Import DWG/DXF as layers*,
+*Recover layers from the drawing*, *Fix encoding*, *Load block attributes from the drawing*. The built-in DWG/DXF
+import has no Python API, so in Processing a DXF/DWG goes through the plugin's own GDAL import (blocks exploded);
+for composite blocks import with the built-in dialog first and give the resulting GeoPackage to the algorithm.
+
 ### Installation
 
 1. Download `wfg_dwg_layers_plus-v<version>.zip` (Releases) or build it with `./make_zip.sh`.
@@ -58,6 +65,12 @@ GPL-2.0-or-later (QGIS). Versions up to 1.5.2 were released under GPL-2.0-or-lat
 # WFG DWG Layers+ (po polsku)
 
 Interfejs wtyczki jest w języku QGIS: po polsku w polskim QGIS, w pozostałych po angielsku.
+
+**Gdzie jest wtyczka:** menu *Wektor → WFG DWG Layers+*, *Warstwa → Dodaj warstwę → Dodaj warstwę DWG/DXF+…*
+(także na pasku Zarządzanie warstwami) oraz **Przybornik Processing** → *WFG DWG Layers+*: Importuj DWG/DXF jako
+warstwy, Odzyskaj warstwy z rysunku, Napraw kodowanie, Wczytaj atrybuty bloków z rysunku — do modeli i przetwarzania
+wsadowego. Wbudowany import DWG/DXF nie ma API w Pythonie, więc w Processing DXF/DWG idzie przez własny import GDAL
+(bloki rozwinięte); do bloków złożonych najpierw zaimportuj rysunek oknem wbudowanym i podaj algorytmowi powstały GeoPackage.
 
 Wtyczka QGIS z rodziny WFG (WorkFieldGIS), która naprawia to, co w imporcie DWG/DXF najbardziej uwiera: **warstwy nazywają się jak w CAD-zie i leżą w czterech grupach wg typu geometrii**, a bloki można zaimportować jako pojedyncze obiekty zamiast luźnych linii.
 

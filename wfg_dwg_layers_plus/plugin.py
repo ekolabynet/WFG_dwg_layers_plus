@@ -38,6 +38,18 @@ class DwgLayersPlusPlugin(object):
         self.iface = iface
         self.actions = []
         self.dialog = None
+        self.provider = None
+        self.add_layer_action = None
+
+    def initProcessing(self):  # noqa: N802
+        """The plugin's tools in the Processing Toolbox (models, batch runs)."""
+        if self.provider is not None:          # QGIS may call it before initGui (qgis_process)
+            return
+        from qgis.core import QgsApplication
+        from .processing_provider import DwgLayersPlusProvider
+
+        self.provider = DwgLayersPlusProvider()
+        QgsApplication.processingRegistry().addProvider(self.provider)
 
     def initGui(self):  # noqa: N802
         try:
@@ -113,6 +125,19 @@ class DwgLayersPlusPlugin(object):
         self.iface.addPluginToVectorMenu(MENU, split)
         self.actions.append(split)
 
+        # Layer > Add Layer > Add DWG/DXF+ Layer… (and the Manage Layers toolbar), next to the other sources
+        self.add_layer_action = QAction(icon, tr("Dodaj warstwę DWG/DXF+…"), self.iface.mainWindow())
+        self.add_layer_action.setObjectName("wfgDwgLayersPlusAddLayer")
+        self.add_layer_action.setStatusTip(
+            tr("Import DWG/DXF z warstwami nazwanymi jak w CAD, w czterech grupach"))
+        self.add_layer_action.triggered.connect(self.run)
+        try:
+            self.iface.insertAddLayerAction(self.add_layer_action)
+        except AttributeError:
+            self.iface.addLayerMenu().addAction(self.add_layer_action)
+
+        self.initProcessing()
+
         about = QAction(icon, tr("O wtyczce…"), self.iface.mainWindow())
         about.triggered.connect(self.show_about)
         self.iface.addPluginToVectorMenu(MENU, about)
@@ -123,6 +148,16 @@ class DwgLayersPlusPlugin(object):
             self.iface.removePluginVectorMenu(MENU, action)
             self.iface.removeToolBarIcon(action)
         self.actions = []
+        if self.add_layer_action is not None:
+            try:
+                self.iface.removeAddLayerAction(self.add_layer_action)
+            except AttributeError:
+                self.iface.addLayerMenu().removeAction(self.add_layer_action)
+            self.add_layer_action = None
+        if self.provider is not None:
+            from qgis.core import QgsApplication
+            QgsApplication.processingRegistry().removeProvider(self.provider)
+            self.provider = None
         if self.dialog is not None:
             self.dialog.close()
             self.dialog = None
