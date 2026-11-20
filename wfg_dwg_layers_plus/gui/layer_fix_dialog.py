@@ -33,6 +33,7 @@ from qgis.PyQt.QtWidgets import (
 
 from ..core import encoding_fix as EF
 from ..core import layer_fix as LF
+from ..i18n import tr
 
 SETTINGS_PREFIX = "wfg_dwg_layers_plus/layerfix/"
 
@@ -46,7 +47,7 @@ class LayerFixDialog(QDialog):
         self._ostatni_gpkg = ""
         self.feedback = QgsFeedback()
 
-        self.setWindowTitle("WFG DWG Layers+ — odzyskaj warstwy z rysunku")
+        self.setWindowTitle(tr("WFG DWG Layers+ — odzyskaj warstwy z rysunku"))
         self.setMinimumWidth(860)
         self.setMinimumHeight(620)
         self._build_ui()
@@ -58,7 +59,7 @@ class LayerFixDialog(QDialog):
         root = QVBoxLayout(self)
 
         intro = QLabel(
-            "Wbudowany import gubi nazwę warstwy dla „ciężkiej\" "
+            tr("Wbudowany import gubi nazwę warstwy dla „ciężkiej\" "
             "<b>POLYLINE</b> — tej z osobnymi encjami <b>VERTEX</b>, którą "
             "wypuszczają eksporty z systemów geodezyjnych. Zapisuje dla niej "
             "uchwyt i warstwę <b>SEQEND</b>-a, czyli encji zamykającej, a ta "
@@ -66,17 +67,17 @@ class LayerFixDialog(QDialog):
             "mają dziesiątki poprawnych nazw, a <i>polylines</i> jedną.<br><br>"
             "Uchwyt przeżywa import, więc wystarczy przeczytać rysunek "
             "i podstawić pod uchwyt zamknięcia warstwę polilinii, którą ono "
-            "zamyka. Geometrii to nie dotyka i nie wymaga ponownego importu."
+            "zamyka. Geometrii to nie dotyka i nie wymaga ponownego importu.")
         )
         intro.setWordWrap(True)
         root.addWidget(intro)
 
-        box = QGroupBox("Pliki")
+        box = QGroupBox(tr("Pliki"))
         form = QFormLayout(box)
 
         row = QHBoxLayout()
         self.ed_gpkg = QLineEdit()
-        self.ed_gpkg.setPlaceholderText("GeoPackage z importu")
+        self.ed_gpkg.setPlaceholderText(tr("GeoPackage z importu"))
         self.ed_gpkg.editingFinished.connect(self._guess_dxf)
         self.ed_gpkg.textChanged.connect(self._guess_dxf)
         btn = QPushButton("…")
@@ -88,13 +89,13 @@ class LayerFixDialog(QDialog):
 
         row2 = QHBoxLayout()
         self.ed_dxf = QLineEdit()
-        self.ed_dxf.setPlaceholderText("plik DXF, z którego powstał import")
+        self.ed_dxf.setPlaceholderText(tr("plik DXF, z którego powstał import"))
         btn2 = QPushButton("…")
         btn2.setFixedWidth(32)
         btn2.clicked.connect(self._pick_dxf)
         row2.addWidget(self.ed_dxf)
         row2.addWidget(btn2)
-        form.addRow("Rysunek DXF:", row2)
+        form.addRow(tr("Rysunek DXF:"), row2)
 
         self.lbl_hint = QLabel("")
         self.lbl_hint.setWordWrap(True)
@@ -103,7 +104,7 @@ class LayerFixDialog(QDialog):
         root.addWidget(box)
 
         scan_row = QHBoxLayout()
-        self.btn_scan = QPushButton("Sprawdź (podgląd zmian)")
+        self.btn_scan = QPushButton(tr("Sprawdź (podgląd zmian)"))
         self.btn_scan.clicked.connect(self._scan)
         scan_row.addWidget(self.btn_scan)
         scan_row.addStretch(1)
@@ -111,8 +112,8 @@ class LayerFixDialog(QDialog):
 
         self.table = QTableWidget(0, 6)
         self.table.setHorizontalHeaderLabels(
-            ["Tabela", "Obiektów", "Dopasowanych", "Do zmiany", "Warstw teraz",
-             "Warstw po naprawie"]
+            [tr("Tabela"), tr("Obiektów"), tr("Dopasowanych"), tr("Do zmiany"), tr("Warstw teraz"),
+             tr("Warstw po naprawie")]
         )
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
@@ -128,20 +129,20 @@ class LayerFixDialog(QDialog):
         self.przyklady.setTextFormat(Qt.TextFormat.RichText)
         root.addWidget(self.przyklady)
 
-        opts = QGroupBox("Opcje")
+        opts = QGroupBox(tr("Opcje"))
         olay = QVBoxLayout(opts)
-        self.cb_backup = QCheckBox("Zrób kopię zapasową GeoPackage przed zapisem")
+        self.cb_backup = QCheckBox(tr("Zrób kopię zapasową GeoPackage przed zapisem"))
         self.cb_backup.setChecked(True)
         olay.addWidget(self.cb_backup)
         self.cb_skip_blocks = QCheckBox(
-            "Nie ruszaj encji rozbitych z bloków"
+            tr("Nie ruszaj encji rozbitych z bloków")
         )
         self.cb_skip_blocks.setChecked(True)
         self.cb_skip_blocks.setToolTip(
-            "Kopie rozbitego bloku dzielą jeden uchwyt z jego definicją, więc "
+            tr("Kopie rozbitego bloku dzielą jeden uchwyt z jego definicją, więc "
             "dostałyby warstwę z wnętrza bloku — zwykle 0 — zamiast tej, którą "
             "niesie wstawienie. Dla treści blokowej właściwą drogą jest tryb "
-            "bloków złożonych w oknie importu."
+            "bloków złożonych w oknie importu.")
         )
         self.cb_skip_blocks.toggled.connect(self._reskan_podgladu)
         olay.addWidget(self.cb_skip_blocks)
@@ -161,9 +162,9 @@ class LayerFixDialog(QDialog):
             Qt.Orientation.Horizontal,
         )
         self.btn_apply = self.buttons.button(QDialogButtonBox.StandardButton.Ok)
-        self.btn_apply.setText("Napraw")
+        self.btn_apply.setText(tr("Napraw"))
         self.btn_apply.setEnabled(False)
-        self.buttons.button(QDialogButtonBox.StandardButton.Close).setText("Zamknij")
+        self.buttons.button(QDialogButtonBox.StandardButton.Close).setText(tr("Zamknij"))
         self.buttons.accepted.connect(self._apply)
         self.buttons.rejected.connect(self.reject)
         root.addWidget(self.buttons)
@@ -200,20 +201,20 @@ class LayerFixDialog(QDialog):
         if znaleziony:
             self.ed_dxf.setText(znaleziony)
             self.lbl_hint.setText(
-                "Rysunek znaleziony automatycznie — import zapisał jego ścieżkę "
-                "w GeoPackage."
+                tr("Rysunek znaleziony automatycznie — import zapisał jego ścieżkę "
+                "w GeoPackage.")
             )
         elif kandydaci:
             self.lbl_hint.setText(
-                "Import wskazuje na rysunek <i>{0}</i>, ale go tam nie ma. "
-                "Wskaż plik ręcznie.".format(
+                tr("Import wskazuje na rysunek <i>{0}</i>, ale go tam nie ma. "
+                "Wskaż plik ręcznie.").format(
                     escape(os.path.basename(kandydaci[0]))
                 )
             )
 
     def _pick_gpkg(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "Wybierz GeoPackage", self.ed_gpkg.text(), "GeoPackage (*.gpkg)"
+            self, tr("Wybierz GeoPackage"), self.ed_gpkg.text(), "GeoPackage (*.gpkg)"
         )
         if path:
             self.ed_gpkg.setText(path)
@@ -221,7 +222,7 @@ class LayerFixDialog(QDialog):
 
     def _pick_dxf(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "Wybierz rysunek", self.ed_dxf.text(), "DXF (*.dxf *.DXF)"
+            self, tr("Wybierz rysunek"), self.ed_dxf.text(), "DXF (*.dxf *.DXF)"
         )
         if path:
             self.ed_dxf.setText(path)
@@ -230,16 +231,16 @@ class LayerFixDialog(QDialog):
         gpkg = self.ed_gpkg.text().strip()
         dxf = self.ed_dxf.text().strip()
         if not gpkg or not os.path.exists(gpkg):
-            QMessageBox.warning(self, "WFG DWG Layers+", "Wskaż istniejący GeoPackage.")
+            QMessageBox.warning(self, "WFG DWG Layers+", tr("Wskaż istniejący GeoPackage."))
             return
         if not dxf or not os.path.exists(dxf):
-            QMessageBox.warning(self, "WFG DWG Layers+", "Wskaż istniejący plik DXF.")
+            QMessageBox.warning(self, "WFG DWG Layers+", tr("Wskaż istniejący plik DXF."))
             return
         if dxf.lower().endswith(".dwg"):
             QMessageBox.warning(
                 self, "WFG DWG Layers+",
-                "Źródłem jest DWG. Ta naprawa czyta tylko DXF-a — zapisz "
-                "rysunek jako DXF (ASCII) i wskaż ten plik.",
+                tr("Źródłem jest DWG. Ta naprawa czyta tylko DXF-a — zapisz "
+                "rysunek jako DXF (ASCII) i wskaż ten plik."),
             )
             return
 
@@ -322,25 +323,25 @@ class LayerFixDialog(QDialog):
                     )
                 )
         self.przyklady.setText(
-            "Przykłady: " + "; ".join(proby[:6]) if proby else ""
+            tr("Przykłady: ") + "; ".join(proby[:6]) if proby else ""
         )
 
         zblokow = sum(d.from_blocks for d in wiersze)
         czesci = [
-            "W rysunku: {0} encji z uchwytem, {1} nazw warstw w przestrzeni "
-            "modelu; {2} przypisań odzyskanych przez uchwyt SEQEND-a."
+            tr("W rysunku: {0} encji z uchwytem, {1} nazw warstw w przestrzeni "
+            "modelu; {2} przypisań odzyskanych przez uchwyt SEQEND-a.")
             .format(self.scan.count, self.scan.layer_count,
                     self.scan.via_seqend),
-            "Do poprawy: {0} obiektów.".format(self.plan.changed),
+            tr("Do poprawy: {0} obiektów.").format(self.plan.changed),
         ]
         if self.scan.bez_uchwytu:
             czesci.append(
-                "Encji bez uchwytu: {0} — tych nie da się dopasować."
+                tr("Encji bez uchwytu: {0} — tych nie da się dopasować.")
                 .format(self.scan.bez_uchwytu)
             )
         if zblokow and self.cb_skip_blocks.isChecked():
             czesci.append(
-                "{0} obiektów pochodzi z rozbicia bloków i zostanie pominiętych."
+                tr("{0} obiektów pochodzi z rozbicia bloków i zostanie pominiętych.")
                 .format(zblokow)
             )
         czesci.extend(self.plan.warnings)
@@ -353,9 +354,9 @@ class LayerFixDialog(QDialog):
         zablokowane = podejrzane and podejrzane >= self.plan.changed * 0.5
         if podejrzane:
             czesci.append(
-                "UWAGA: w {0} przypadkach nazwa w bazie różni się od rysunku "
+                tr("UWAGA: w {0} przypadkach nazwa w bazie różni się od rysunku "
                 "wyłącznie kodowaniem polskich znaków. Uruchom najpierw "
-                "„Napraw kodowanie”, a potem wróć tutaj."
+                "„Napraw kodowanie”, a potem wróć tutaj.")
                 .format(podejrzane)
             )
         self.status.setText(" ".join(czesci))
@@ -370,18 +371,18 @@ class LayerFixDialog(QDialog):
         if w_edycji:
             QMessageBox.warning(
                 self, "WFG DWG Layers+",
-                "Zakończ edycję tych warstw przed naprawą — ich bufor "
-                "zapisałby stare wartości z powrotem:\n\n"
+                tr("Zakończ edycję tych warstw przed naprawą — ich bufor "
+                "zapisałby stare wartości z powrotem:\n\n")
                 + "\n".join(l.name() for l in w_edycji[:10]),
             )
             return
 
         odp = QMessageBox.question(
             self, "WFG DWG Layers+",
-            "Przepisać przypisanie warstw do pliku\n{0}?\n\n{1}".format(
+            tr("Przepisać przypisanie warstw do pliku\n{0}?\n\n{1}").format(
                 os.path.basename(gpkg),
-                "Kopia zapasowa zostanie utworzona obok."
-                if self.cb_backup.isChecked() else "UWAGA: bez kopii zapasowej.",
+                tr("Kopia zapasowa zostanie utworzona obok.")
+                if self.cb_backup.isChecked() else tr("UWAGA: bez kopii zapasowej."),
             ),
         )
         if odp != QMessageBox.StandardButton.Yes:
@@ -424,14 +425,14 @@ class LayerFixDialog(QDialog):
 
         QgsSettings().setValue(SETTINGS_PREFIX + "gpkg", gpkg)
 
-        komunikat = ["Poprawiono przypisanie dla {0} obiektów.".format(zmian)]
+        komunikat = [tr("Poprawiono przypisanie dla {0} obiektów.").format(zmian)]
         if kopia:
-            komunikat.append("Kopia zapasowa: {0}".format(os.path.basename(kopia)))
+            komunikat.append(tr("Kopia zapasowa: {0}").format(os.path.basename(kopia)))
         komunikat.append("")
         komunikat.append(
-            "Warstwy wczytane wcześniej mają filtr na starą wartość, więc teraz "
+            tr("Warstwy wczytane wcześniej mają filtr na starą wartość, więc teraz "
             "pokażą mniej obiektów. Uruchom import wtyczki jeszcze raz na tym "
-            "samym GeoPackage — tym razem zobaczy wszystkie warstwy CAD."
+            "samym GeoPackage — tym razem zobaczy wszystkie warstwy CAD.")
         )
         tekst = "\n".join(komunikat)
         self.status.setText(tekst)

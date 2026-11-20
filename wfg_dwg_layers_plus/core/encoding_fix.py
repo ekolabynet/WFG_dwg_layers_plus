@@ -30,6 +30,7 @@ import os
 import re
 import shutil
 import sqlite3
+from ..i18n import tr
 
 #: znaki, które w praktyce pojawiają się tylko w uszkodzonym tekście.
 #: Bez tego testu zwykły, poprawny napis mógłby przypadkiem przejść przez
@@ -344,7 +345,7 @@ def apply_project(project=None, encoding=DEFAULT_ENCODING, fix_filters=True):
                     result.filters += 1
                 else:
                     result.details.append(
-                        "Nie udało się poprawić filtru warstwy {0}".format(layer.name())
+                        tr("Nie udało się poprawić filtru warstwy {0}").format(layer.name())
                     )
 
     for group in project.layerTreeRoot().findGroups(recursive=True):

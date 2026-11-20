@@ -32,6 +32,7 @@ from qgis.PyQt.QtWidgets import (
 )
 
 from ..core import encoding_fix as EF
+from ..i18n import tr
 
 SETTINGS_PREFIX = "wfg_dwg_layers_plus/enc/"
 
@@ -44,7 +45,7 @@ class EncodingDialog(QDialog):
         self.scan_proj = []
         self.feedback = QgsFeedback()
 
-        self.setWindowTitle("WFG DWG Layers+ — napraw kodowanie")
+        self.setWindowTitle(tr("WFG DWG Layers+ — napraw kodowanie"))
         self.setMinimumWidth(820)
         self.setMinimumHeight(600)
         self._build_ui()
@@ -56,21 +57,21 @@ class EncodingDialog(QDialog):
         root = QVBoxLayout(self)
 
         intro = QLabel(
-            "DXF w wersji R2007 i nowszej ma treść w UTF-8, ale wiele CAD-ów "
+            tr("DXF w wersji R2007 i nowszej ma treść w UTF-8, ale wiele CAD-ów "
             "zostawia w nagłówku starą stronę kodową. Biblioteka czytająca "
             "stosuje ją posłusznie i <b>ę</b> zamienia się w <b>Ä™</b>, a "
             "<b>ś</b> w <b>Ĺ›</b>. To jest odwracalne bez straty — trzeba tylko "
-            "zrobić konwersję w drugą stronę."
+            "zrobić konwersję w drugą stronę.")
         )
         intro.setWordWrap(True)
         root.addWidget(intro)
 
-        box = QGroupBox("Plik i kodowanie")
+        box = QGroupBox(tr("Plik i kodowanie"))
         form = QFormLayout(box)
 
         row = QHBoxLayout()
         self.ed_gpkg = QLineEdit()
-        self.ed_gpkg.setPlaceholderText("GeoPackage z importu")
+        self.ed_gpkg.setPlaceholderText(tr("GeoPackage z importu"))
         btn = QPushButton("…")
         btn.setFixedWidth(32)
         btn.clicked.connect(self._pick_gpkg)
@@ -80,22 +81,22 @@ class EncodingDialog(QDialog):
 
         self.cmb_encoding = QComboBox()
         for label, value in (
-            ("cp1250 — polska strona kodowa (domyślnie)", "cp1250"),
-            ("cp1252 — zachodnioeuropejska", "cp1252"),
+            (tr("cp1250 — polska strona kodowa (domyślnie)"), "cp1250"),
+            (tr("cp1252 — zachodnioeuropejska"), "cp1252"),
             ("latin-1", "latin-1"),
-            ("cp1251 — cyrylica", "cp1251"),
+            (tr("cp1251 — cyrylica"), "cp1251"),
         ):
             self.cmb_encoding.addItem(label, value)
         self.cmb_encoding.setToolTip(
-            "Strona kodowa, przez którą tekst został błędnie przepuszczony. "
-            "Dla rysunków z polskich CAD-ów to prawie zawsze cp1250."
+            tr("Strona kodowa, przez którą tekst został błędnie przepuszczony. "
+            "Dla rysunków z polskich CAD-ów to prawie zawsze cp1250.")
         )
-        form.addRow("Błędna strona kodowa:", self.cmb_encoding)
+        form.addRow(tr("Błędna strona kodowa:"), self.cmb_encoding)
 
         root.addWidget(box)
 
         scan_row = QHBoxLayout()
-        self.btn_scan = QPushButton("Skanuj (podgląd zmian)")
+        self.btn_scan = QPushButton(tr("Skanuj (podgląd zmian)"))
         self.btn_scan.clicked.connect(self._scan)
         scan_row.addWidget(self.btn_scan)
         scan_row.addStretch(1)
@@ -103,7 +104,7 @@ class EncodingDialog(QDialog):
 
         self.table = QTableWidget(0, 4)
         self.table.setHorizontalHeaderLabels(
-            ["Gdzie", "Ile", "Przed", "Po"]
+            [tr("Gdzie"), tr("Ile"), tr("Przed"), tr("Po")]
         )
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
@@ -115,25 +116,25 @@ class EncodingDialog(QDialog):
         header.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
         root.addWidget(self.table, 1)
 
-        opts = QGroupBox("Co poprawić")
+        opts = QGroupBox(tr("Co poprawić"))
         olay = QVBoxLayout(opts)
 
-        self.cb_data = QCheckBox("Dane w GeoPackage (nazwy warstw CAD, bloków, treść tekstów)")
+        self.cb_data = QCheckBox(tr("Dane w GeoPackage (nazwy warstw CAD, bloków, treść tekstów)"))
         self.cb_data.setChecked(True)
         olay.addWidget(self.cb_data)
 
-        self.cb_backup = QCheckBox("Zrób kopię zapasową GeoPackage przed zapisem")
+        self.cb_backup = QCheckBox(tr("Zrób kopię zapasową GeoPackage przed zapisem"))
         self.cb_backup.setChecked(True)
         olay.addWidget(self.cb_backup)
 
         self.cb_project = QCheckBox(
-            "Nazwy warstw i grup w projekcie oraz filtry warstw"
+            tr("Nazwy warstw i grup w projekcie oraz filtry warstw")
         )
         self.cb_project.setChecked(True)
         self.cb_project.setToolTip(
-            "Filtry odwołują się do wartości kolumny 'layer', więc poprawia się "
+            tr("Filtry odwołują się do wartości kolumny 'layer', więc poprawia się "
             "je razem z danymi. Osobno nie miałoby to sensu — poprawiony filtr "
-            "na nienaprawionych danych nie pasowałby do niczego."
+            "na nienaprawionych danych nie pasowałby do niczego.")
         )
         olay.addWidget(self.cb_project)
 
@@ -153,9 +154,9 @@ class EncodingDialog(QDialog):
             Qt.Orientation.Horizontal,
         )
         self.btn_apply = self.buttons.button(QDialogButtonBox.StandardButton.Ok)
-        self.btn_apply.setText("Napraw")
+        self.btn_apply.setText(tr("Napraw"))
         self.btn_apply.setEnabled(False)
-        self.buttons.button(QDialogButtonBox.StandardButton.Close).setText("Zamknij")
+        self.buttons.button(QDialogButtonBox.StandardButton.Close).setText(tr("Zamknij"))
         self.buttons.accepted.connect(self._apply)
         self.buttons.rejected.connect(self.reject)
         root.addWidget(self.buttons)
@@ -176,7 +177,7 @@ class EncodingDialog(QDialog):
 
     def _pick_gpkg(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "Wybierz GeoPackage", self.ed_gpkg.text(), "GeoPackage (*.gpkg)"
+            self, tr("Wybierz GeoPackage"), self.ed_gpkg.text(), "GeoPackage (*.gpkg)"
         )
         if path:
             self.ed_gpkg.setText(path)
@@ -223,7 +224,7 @@ class EncodingDialog(QDialog):
         for rodzaj, pary in sorted(rodzaje.items()):
             before, after = pary[0]
             wiersze.append(
-                ("projekt: {0}".format(rodzaj), str(len(pary)), before, after)
+                (tr("projekt: {0}").format(rodzaj), str(len(pary)), before, after)
             )
 
         self.table.setRowCount(len(wiersze))
@@ -239,10 +240,10 @@ class EncodingDialog(QDialog):
         w_gpkg = self.scan_gpkg.total if self.scan_gpkg else 0
         w_proj = len(self.scan_proj)
         self.status.setText(
-            "Do poprawy: {0} wartości w GeoPackage, {1} pozycji w projekcie."
+            tr("Do poprawy: {0} wartości w GeoPackage, {1} pozycji w projekcie.")
             .format(w_gpkg, w_proj)
             if (w_gpkg or w_proj)
-            else "Nic nie wymaga naprawy — teksty wyglądają poprawnie."
+            else tr("Nic nie wymaga naprawy — teksty wyglądają poprawnie.")
         )
         self.btn_apply.setEnabled(bool(w_gpkg or w_proj))
 
@@ -254,7 +255,7 @@ class EncodingDialog(QDialog):
         if self.cb_data.isChecked():
             if not gpkg or not os.path.exists(gpkg):
                 QMessageBox.warning(
-                    self, "WFG DWG Layers+", "Wskaż istniejący GeoPackage."
+                    self, "WFG DWG Layers+", tr("Wskaż istniejący GeoPackage.")
                 )
                 return
 
@@ -262,8 +263,8 @@ class EncodingDialog(QDialog):
             if w_edycji:
                 QMessageBox.warning(
                     self, "WFG DWG Layers+",
-                    "Zakończ edycję tych warstw przed naprawą — ich bufor "
-                    "zapisałby stare wartości z powrotem:\n\n"
+                    tr("Zakończ edycję tych warstw przed naprawą — ich bufor "
+                    "zapisałby stare wartości z powrotem:\n\n")
                     + "\n".join(l.name() for l in w_edycji[:10]),
                 )
                 return
@@ -271,20 +272,20 @@ class EncodingDialog(QDialog):
             if not self.cb_project.isChecked() and self.scan_proj:
                 odp = QMessageBox.question(
                     self, "WFG DWG Layers+",
-                    "Poprawiasz dane, ale nie projekt. Filtry warstw nadal będą "
+                    tr("Poprawiasz dane, ale nie projekt. Filtry warstw nadal będą "
                     "wskazywać stare wartości i takie warstwy pokażą zero "
-                    "obiektów.\n\nKontynuować mimo to?",
+                    "obiektów.\n\nKontynuować mimo to?"),
                 )
                 if odp != QMessageBox.StandardButton.Yes:
                     return
             odp = QMessageBox.question(
                 self,
                 "WFG DWG Layers+",
-                "Zapisać poprawki do pliku\n{0}?\n\n{1}".format(
+                tr("Zapisać poprawki do pliku\n{0}?\n\n{1}").format(
                     os.path.basename(gpkg),
-                    "Kopia zapasowa zostanie utworzona obok."
+                    tr("Kopia zapasowa zostanie utworzona obok.")
                     if self.cb_backup.isChecked()
-                    else "UWAGA: bez kopii zapasowej.",
+                    else tr("UWAGA: bez kopii zapasowej."),
                 ),
             )
             if odp != QMessageBox.StandardButton.Yes:
@@ -307,17 +308,17 @@ class EncodingDialog(QDialog):
                     self.feedback, self._progress,
                 )
                 komunikaty.append(
-                    "GeoPackage: poprawiono {0} wartości.".format(zmian)
+                    tr("GeoPackage: poprawiono {0} wartości.").format(zmian)
                 )
                 if kopia:
                     komunikaty.append(
-                        "Kopia zapasowa: {0}".format(os.path.basename(kopia))
+                        tr("Kopia zapasowa: {0}").format(os.path.basename(kopia))
                     )
 
             if self.cb_project.isChecked():
                 wynik = EF.apply_project(encoding=enc, fix_filters=True)
                 komunikaty.append(
-                    "Projekt: warstw {0}, grup {1}, filtrów {2}.".format(
+                    tr("Projekt: warstw {0}, grup {1}, filtrów {2}.").format(
                         wynik.layers, wynik.groups, wynik.filters
                     )
                 )
@@ -345,7 +346,7 @@ class EncodingDialog(QDialog):
         settings.setValue(SETTINGS_PREFIX + "encoding", enc)
 
         komunikaty.append("")
-        komunikaty.append("Pamiętaj zapisać projekt.")
+        komunikaty.append(tr("Pamiętaj zapisać projekt."))
         tekst = "\n".join(komunikaty)
         self.status.setText(tekst)
         QMessageBox.information(self, "WFG DWG Layers+", tekst)

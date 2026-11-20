@@ -35,6 +35,7 @@ from .qgis_compat import (
     render_unit,
     symbol_property,
 )
+from ..i18n import tr
 
 
 class StyleOptions(object):
@@ -470,7 +471,7 @@ def apply_style(layer, table, override_color=None, opts=None):
         # ...ale cicha porazka zostawia warstwe z domyslnym rendererem QGIS,
         # co wyglada jak blad importu. Lepiej krzyknac do dziennika.
         QgsMessageLog.logMessage(
-            "Nie udalo sie ostylowac warstwy {0} ({1}): {2}".format(
+            tr("Nie udalo sie ostylowac warstwy {0} ({1}): {2}").format(
                 layer.name(), table, exc
             ),
             "WFG DWG Layers+",
@@ -552,7 +553,7 @@ def style_block_layer(layer, kind, color=None, opts=None):
             _apply_swatch(layer, sample_color(layer))
     except Exception as exc:
         QgsMessageLog.logMessage(
-            "Nie udalo sie ostylowac warstwy bloku {0}: {1}".format(
+            tr("Nie udalo sie ostylowac warstwy bloku {0}: {1}").format(
                 layer.name(), exc
             ),
             "WFG DWG Layers+",

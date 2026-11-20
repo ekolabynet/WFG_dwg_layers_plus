@@ -9,6 +9,7 @@ import os
 
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
+from .i18n import tr
 
 MENU = "WFG DWG Layers+"
 OLD_SETTINGS_PREFIX = "dwg_layers_plus/"
@@ -46,10 +47,10 @@ class DwgLayersPlusPlugin(object):
         icon_path = os.path.join(os.path.dirname(__file__), "icon.png")
         icon = QIcon(icon_path) if os.path.exists(icon_path) else QIcon()
 
-        action = QAction(icon, "Importuj DWG/DXF jako warstwy…", self.iface.mainWindow())
+        action = QAction(icon, tr("Importuj DWG/DXF jako warstwy…"), self.iface.mainWindow())
         action.setObjectName("dwgLayersPlusImport")
         action.setStatusTip(
-            "Import DWG/DXF z warstwami nazwanymi jak w CAD, w czterech grupach"
+            tr("Import DWG/DXF z warstwami nazwanymi jak w CAD, w czterech grupach")
         )
         action.triggered.connect(self.run)
         self.iface.addPluginToVectorMenu(MENU, action)
@@ -57,62 +58,62 @@ class DwgLayersPlusPlugin(object):
         self.actions.append(action)
 
         restyle = QAction(
-            icon, "Popraw wygląd wczytanych warstw…", self.iface.mainWindow()
+            icon, tr("Popraw wygląd wczytanych warstw…"), self.iface.mainWindow()
         )
         restyle.setObjectName("dwgLayersPlusRestyle")
         restyle.setStatusTip(
-            "Nakłada style WFG DWG Layers+ na warstwy już wczytane do projektu, "
-            "bez ponownego importu rysunku"
+            tr("Nakłada style WFG DWG Layers+ na warstwy już wczytane do projektu, "
+            "bez ponownego importu rysunku")
         )
         restyle.triggered.connect(self.run_restyle)
         self.iface.addPluginToVectorMenu(MENU, restyle)
         self.actions.append(restyle)
 
         attrs = QAction(
-            icon, "Wczytaj atrybuty bloków z rysunku…", self.iface.mainWindow()
+            icon, tr("Wczytaj atrybuty bloków z rysunku…"), self.iface.mainWindow()
         )
         attrs.setObjectName("dwgLayersPlusAttributes")
         attrs.setStatusTip(
-            "Odzyskuje wartości atrybutów bloków (ATTRIB), których wbudowany "
-            "import DWG/DXF nie widzi, i skleja je z importem po uchwycie encji"
+            tr("Odzyskuje wartości atrybutów bloków (ATTRIB), których wbudowany "
+            "import DWG/DXF nie widzi, i skleja je z importem po uchwycie encji")
         )
         attrs.triggered.connect(self.run_attributes)
         self.iface.addPluginToVectorMenu(MENU, attrs)
         self.actions.append(attrs)
 
-        enc = QAction(icon, "Napraw kodowanie…", self.iface.mainWindow())
+        enc = QAction(icon, tr("Napraw kodowanie…"), self.iface.mainWindow())
         enc.setObjectName("dwgLayersPlusEncoding")
         enc.setStatusTip(
-            "Usuwa podwójne kodowanie polskich znaków w nazwach warstw, "
-            "nazwach bloków i treści tekstów"
+            tr("Usuwa podwójne kodowanie polskich znaków w nazwach warstw, "
+            "nazwach bloków i treści tekstów")
         )
         enc.triggered.connect(self.run_encoding)
         self.iface.addPluginToVectorMenu(MENU, enc)
         self.actions.append(enc)
 
         layerfix = QAction(
-            icon, "Odzyskaj warstwy z rysunku…", self.iface.mainWindow()
+            icon, tr("Odzyskaj warstwy z rysunku…"), self.iface.mainWindow()
         )
         layerfix.setObjectName("dwgLayersPlusLayerFix")
         layerfix.setStatusTip(
-            "Gdy cała kreska wylądowała na warstwie 0, a w rysunku ma swoje "
-            "warstwy — przepisuje przypisanie z DXF-a po uchwycie encji"
+            tr("Gdy cała kreska wylądowała na warstwie 0, a w rysunku ma swoje "
+            "warstwy — przepisuje przypisanie z DXF-a po uchwycie encji")
         )
         layerfix.triggered.connect(self.run_layer_fix)
         self.iface.addPluginToVectorMenu(MENU, layerfix)
         self.actions.append(layerfix)
 
-        split = QAction(icon, "Podziel warstwę wg koloru…", self.iface.mainWindow())
+        split = QAction(icon, tr("Podziel warstwę wg koloru…"), self.iface.mainWindow())
         split.setObjectName("dwgLayersPlusColorSplit")
         split.setStatusTip(
-            "Dla rysunków, w których cała kreska leży na warstwie 0, "
-            "a treść rozróżnia barwa"
+            tr("Dla rysunków, w których cała kreska leży na warstwie 0, "
+            "a treść rozróżnia barwa")
         )
         split.triggered.connect(self.run_color_split)
         self.iface.addPluginToVectorMenu(MENU, split)
         self.actions.append(split)
 
-        about = QAction(icon, "O wtyczce…", self.iface.mainWindow())
+        about = QAction(icon, tr("O wtyczce…"), self.iface.mainWindow())
         about.triggered.connect(self.show_about)
         self.iface.addPluginToVectorMenu(MENU, about)
         self.actions.append(about)
@@ -170,7 +171,7 @@ class DwgLayersPlusPlugin(object):
         QMessageBox.information(
             self.iface.mainWindow(),
             "WFG DWG Layers+",
-            "WFG DWG Layers+ — import DWG/DXF do QGIS z prawdziwymi warstwami.\n\n"
+            tr("WFG DWG Layers+ — import DWG/DXF do QGIS z prawdziwymi warstwami.\n\n"
             "• nazwy warstw: <warstwa_CAD>_hatch / _line / _pline / _point / "
             "_text / _insert\n"
             "• cztery grupy wg typu geometrii\n"
@@ -184,5 +185,5 @@ class DwgLayersPlusPlugin(object):
             "  dla ciezkiej POLYLINE i cala kreska wylandowala na warstwie 0\n"
             "• podzial warstwy wg koloru, grubosci pisaka i typu encji\n\n"
             "Wtyczka opiera sie na schemacie GeoPackage produkowanym przez "
-            "wbudowany import DWG/DXF w QGIS.",
+            "wbudowany import DWG/DXF w QGIS."),
         )

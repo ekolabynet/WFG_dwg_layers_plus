@@ -11,6 +11,8 @@ Schemat jest identyczny od 3.34 do master, dlatego mozna sie na nim oprzec.
 Modul jest celowo czysto danymi (bez importow QGIS), zeby dalo sie go testowac
 poza QGIS-em.
 """
+from ..i18n import tr
+
 
 # --- tabele -----------------------------------------------------------------
 
@@ -132,17 +134,17 @@ DEFAULT_SUFFIXES = {
 #: domyslne nazwy czterech grup geometrycznych, w kolejnosci rysowania
 #: (pierwsza = na wierzchu legendy)
 DEFAULT_GROUPS = {
-    KIND_TEXT: "4_Teksty",
-    KIND_POINT: "3_Punkty",
-    KIND_LINE: "2_Linie",
-    KIND_POLYGON: "1_Poligony",
+    KIND_TEXT: tr("4_Teksty"),
+    KIND_POINT: tr("3_Punkty"),
+    KIND_LINE: tr("2_Linie"),
+    KIND_POLYGON: tr("1_Poligony"),
 }
 
 #: kolejnosc dodawania grup do drzewa: pierwsza na gorze legendy
 GROUP_ORDER = (KIND_TEXT, KIND_POINT, KIND_LINE, KIND_POLYGON)
 
 #: nazwa piatej grupy uzywanej w trybie zlozonych geometrii blokow
-DEFAULT_BLOCK_GROUP = "5_Bloki"
+DEFAULT_BLOCK_GROUP = tr("5_Bloki")
 
 #: tabela pomocnicza z mapowaniem nazw tabel na oryginalne nazwy warstw CAD
 MAP_TABLE = "dwgplus_layer_map"

@@ -30,6 +30,7 @@ import os
 import re
 
 from . import naming
+from ..i18n import tr
 
 #: nazwa tabeli z atrybutami w GeoPackage
 TABLE = "dwgplus_block_attributes"
@@ -150,17 +151,17 @@ def scan(dxf_path, feedback=None, progress_cb=None, block_filter=None,
     try:
         from osgeo import gdal, ogr
     except ImportError as exc:  # noqa: BLE001
-        raise AttributeError_("Brak modułu osgeo (GDAL): {0}".format(exc))
+        raise AttributeError_(tr("Brak modułu osgeo (GDAL): {0}").format(exc))
 
     if not os.path.exists(dxf_path):
-        raise AttributeError_("Plik nie istnieje: {0}".format(dxf_path))
+        raise AttributeError_(tr("Plik nie istnieje: {0}").format(dxf_path))
 
     path = dxf_path
     if os.path.splitext(path)[1].lower() == ".dwg":
         from . import producer_ogr
 
         if progress_cb:
-            progress_cb(0, "Konwersja DWG → DXF…")
+            progress_cb(0, tr("Konwersja DWG → DXF…"))
         path = producer_ogr.convert_dwg_to_dxf(path)
 
     scan_result = AttributeScan()
@@ -185,7 +186,7 @@ def scan(dxf_path, feedback=None, progress_cb=None, block_filter=None,
     try:
         src = ogr.Open(path)
         if src is None:
-            raise AttributeError_("GDAL nie otworzył pliku: {0}".format(path))
+            raise AttributeError_(tr("GDAL nie otworzył pliku: {0}").format(path))
         # UWAGA: przy DXF_INLINE_BLOCKS=FALSE sterownik wystawia DWIE warstwy,
         # 'blocks' i 'entities', a GetLayer(0) to 'blocks'. Wstawienia
         # z atrybutami są w 'entities'.
@@ -196,9 +197,9 @@ def scan(dxf_path, feedback=None, progress_cb=None, block_filter=None,
         idx_att = defn.GetFieldIndex("BlockAttributes")
         if idx_att < 0:
             raise AttributeError_(
-                "Ten plik nie ma pola BlockAttributes — GDAL nie zobaczył "
+                tr("Ten plik nie ma pola BlockAttributes — GDAL nie zobaczył "
                 "żadnych atrybutów bloków. Sprawdź, czy rysunek na pewno "
-                "używa atrybutów, a nie zwykłych tekstów."
+                "używa atrybutów, a nie zwykłych tekstów.")
             )
 
         # Swiadomie NIE wolamy GetFeatureCount(): sterownik DXF musialby
@@ -209,7 +210,7 @@ def scan(dxf_path, feedback=None, progress_cb=None, block_filter=None,
             if feedback is not None and feedback.isCanceled():
                 break
             if progress_cb is not None and i % 5000 == 0:
-                progress_cb(-1, "Przetworzono encji: {0}".format(i))
+                progress_cb(-1, tr("Przetworzono encji: {0}").format(i))
 
             if idx_att < 0 or not feat.IsFieldSet(idx_att):
                 continue
@@ -332,7 +333,7 @@ def write_table(gpkg_path, scan_result, columns, feedback=None):
     try:
         from osgeo import gdal, ogr
     except ImportError as exc:  # noqa: BLE001
-        raise AttributeError_("Brak modułu osgeo (GDAL): {0}".format(exc))
+        raise AttributeError_(tr("Brak modułu osgeo (GDAL): {0}").format(exc))
 
     had_exceptions = gdal.GetUseExceptions()
     had_ogr_exceptions = ogr.GetUseExceptions()
@@ -342,7 +343,7 @@ def write_table(gpkg_path, scan_result, columns, feedback=None):
         ds = ogr.Open(gpkg_path, 1)
         if ds is None:
             raise AttributeError_(
-                "Nie można otworzyć GeoPackage do zapisu: {0}".format(gpkg_path)
+                tr("Nie można otworzyć GeoPackage do zapisu: {0}").format(gpkg_path)
             )
         # Uchwyt warstwy uniewaznia sie po DeleteLayer — dotkniecie go potem
         # konczy sie segfaultem, wiec zrzucamy referencje przed usunieciem.
@@ -452,7 +453,7 @@ def load_table_layer(gpkg_path, name=None):
     from qgis.core import QgsVectorLayer
 
     layer = QgsVectorLayer(
-        "{0}|layername={1}".format(gpkg_path, TABLE), name or "Atrybuty bloków", "ogr"
+        "{0}|layername={1}".format(gpkg_path, TABLE), name or tr("Atrybuty bloków"), "ogr"
     )
     return layer if layer.isValid() else None
 
@@ -479,7 +480,7 @@ def attach_joins(gpkg_path, project=None, prefix="", table_layer=None):
     layer = table_layer or load_table_layer(gpkg_path)
     if layer is None:
         result.errors.append(
-            "Nie udało się wczytać tabeli {0} z {1}".format(TABLE, gpkg_path)
+            tr("Nie udało się wczytać tabeli {0} z {1}").format(TABLE, gpkg_path)
         )
         return result
 
@@ -522,7 +523,7 @@ def attach_joins(gpkg_path, project=None, prefix="", table_layer=None):
         if candidate.addJoin(info):
             result.joined.append(candidate.name())
         else:
-            result.errors.append("Nie podpięto złączenia do {0}".format(candidate.name()))
+            result.errors.append(tr("Nie podpięto złączenia do {0}").format(candidate.name()))
 
     return result
 

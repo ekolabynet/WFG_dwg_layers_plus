@@ -1,5 +1,64 @@
 # WFG DWG Layers+
 
+**English** · [Polski](#polski)
+
+QGIS plugin of the WFG (WorkFieldGIS) family that fixes what hurts most in DWG/DXF import: **every CAD layer becomes
+its own QGIS layer, arranged in four groups by geometry type**, and blocks can be imported as single features instead
+of loose lines. The interface follows the QGIS language: Polish in Polish QGIS, English otherwise.
+
+### What it does
+
+The built-in import (*Project → Import/Export → Import Layers from DWG/DXF*) writes one table per geometry type and
+shows CAD layers only as filters. WFG DWG Layers+ reads the same GeoPackage and builds a tree:
+
+```
+my_drawing/
+├── 4_Texts/      <cad_layer>_text
+├── 3_Points/     <cad_layer>_point, <cad_layer>_insert
+├── 2_Lines/      <cad_layer>_line, <cad_layer>_pline
+├── 1_Polygons/   <cad_layer>_hatch
+└── 5_Blocks/     blk_<block>_line / _hatch / _point / _text, blk__anchor   (composite block mode)
+```
+
+Menu *Vector → WFG DWG Layers+*:
+
+| Item | What for |
+|---|---|
+| Import DWG/DXF as layers… | the tree above; filter mode (fast) or separate GPKG tables; blocks exploded, as insert points or as composite geometry (one feature per insert, nested blocks, MINSERT, layer 0 inheritance) |
+| Fix appearance of loaded layers… | applies the styles to layers already in the project (fallback line width, pen width vs ground width of polylines, legend colours) |
+| Load block attributes from the drawing… | ATTRIB values (elevations, numbers) that the built-in import does not read at all; joined by entity handle |
+| Fix encoding… | reverses double encoding of accented characters (`Ä™` → `ę`), in the data and in project filters, with a backup |
+| Recover layers from the drawing… | heavy POLYLINE that landed on layer 0: the layer is rewritten from the DXF by handle, geometry untouched |
+| Split layer by colour… | drawings that really keep everything on layer 0 and separate content by colour, pen weight or entity type |
+
+### Installation
+
+1. Download `wfg_dwg_layers_plus-v<version>.zip` (Releases) or build it with `./make_zip.sh`.
+2. QGIS → *Plugins → Manage and Install Plugins → Install from ZIP*.
+3. Requirements: QGIS 3.28 or newer (QGIS 4 too). DXF needs nothing else. DWG goes through the built-in import; the
+   optional own GDAL import of DWG needs ODA File Converter or LibreDWG (`dwg2dxf`), installed separately.
+
+Tested on Linux (QGIS 4). Reports from Windows and macOS are welcome in the issue tracker.
+
+### Language
+
+Texts in the code are Polish (source language); `i18n.tr()` returns English from `i18n_en.py` unless QGIS runs in
+Polish. `WFG_LANG=en` or `WFG_LANG=pl` forces the language. `test/test_i18n.py` checks that every text has a
+translation with the same placeholders.
+
+### License
+
+Mozilla Public License 2.0 (`wfg_dwg_layers_plus/LICENSE`), © 2026 Piotr Mędrzycki. MPL-2.0 is compatible with
+GPL-2.0-or-later (QGIS). Versions up to 1.5.2 were released under GPL-2.0-or-later.
+
+---
+
+<a id="polski"></a>
+
+# WFG DWG Layers+ (po polsku)
+
+Interfejs wtyczki jest w języku QGIS: po polsku w polskim QGIS, w pozostałych po angielsku.
+
 Wtyczka QGIS z rodziny WFG (WorkFieldGIS), która naprawia to, co w imporcie DWG/DXF najbardziej uwiera: **warstwy nazywają się jak w CAD-zie i leżą w czterech grupach wg typu geometrii**, a bloki można zaimportować jako pojedyncze obiekty zamiast luźnych linii.
 
 ## Co dokładnie robi

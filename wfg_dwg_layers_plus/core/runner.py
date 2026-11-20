@@ -12,6 +12,7 @@ from qgis.core import Qgis, QgsFeedback, QgsMessageLog, QgsProject
 from . import blocks as blocks_mod
 from . import gpkg_reader, gpkg_schema as S, materializer, producer_builtin
 from . import producer_ogr, tree_builder
+from ..i18n import tr
 
 LOG_TAG = "WFG DWG Layers+"
 
@@ -47,16 +48,16 @@ class RunResult(object):
     def summary(self):
         parts = []
         if self.tree is not None:
-            parts.append("warstw: {0}".format(self.tree.count))
+            parts.append(tr("warstw: {0}").format(self.tree.count))
         if self.materialized is not None:
-            parts.append("zmaterializowanych tabel: {0}".format(self.materialized.written))
+            parts.append(tr("zmaterializowanych tabel: {0}").format(self.materialized.written))
         if self.blocks is not None and self.blocks.instances:
             parts.append(
-                "blokow: {0} wstawien / {1} czesci".format(
+                tr("blokow: {0} wstawien / {1} czesci").format(
                     self.blocks.instances, self.blocks.parts
                 )
             )
-        return ", ".join(parts) or "brak warstw"
+        return ", ".join(parts) or tr("brak warstw")
 
 
 def default_gpkg_for(source_path):
@@ -74,8 +75,8 @@ def prepare_gpkg(config, iface=None, feedback=None, progress_cb=None):
     if ext == ".gpkg":
         if not gpkg_reader.looks_like_dwg_gpkg(source):
             raise gpkg_reader.GpkgReadError(
-                "Wskazany GeoPackage nie pochodzi z importu DWG/DXF "
-                "(brak tabel 'layers' i 'blocks')."
+                tr("Wskazany GeoPackage nie pochodzi z importu DWG/DXF "
+                "(brak tabel 'layers' i 'blocks').")
             )
         return source
 
@@ -84,7 +85,7 @@ def prepare_gpkg(config, iface=None, feedback=None, progress_cb=None):
         dxf = source
         if ext == ".dwg":
             if progress_cb:
-                progress_cb(0, "Konwersja DWG -> DXF...")
+                progress_cb(0, tr("Konwersja DWG -> DXF..."))
             dxf = producer_ogr.convert_dwg_to_dxf(source)
         # import_dxf moze zwrocic inna sciezke, jesli cel byl juz zajety
         return producer_ogr.import_dxf(
@@ -110,12 +111,12 @@ def run(config, iface=None, feedback=None, progress_cb=None):
         if progress_cb is not None:
             progress_cb(pct, msg)
 
-    report(0, "Przygotowanie zrodla...")
+    report(0, tr("Przygotowanie zrodla..."))
     gpkg = prepare_gpkg(config, iface, feedback, progress_cb)
     result.gpkg_path = gpkg
     config.gpkg_path = gpkg
 
-    report(15, "Inwentaryzacja warstw...")
+    report(15, tr("Inwentaryzacja warstw..."))
     inv = gpkg_reader.inventory(gpkg, feedback)
     result.inventory = inv
 
@@ -126,7 +127,7 @@ def run(config, iface=None, feedback=None, progress_cb=None):
 
     materialized = None
     if config.tree.layer_mode == S.LayerMode.MATERIALIZE:
-        report(25, "Materializacja warstw...")
+        report(25, tr("Materializacja warstw..."))
         materialized = materializer.materialize(
             gpkg, inv, cad_layers, config.tree, feedback,
             config.segmentize_on_materialize,
@@ -141,7 +142,7 @@ def run(config, iface=None, feedback=None, progress_cb=None):
     # bloki dziedzicza ten sam wyglad co reszta importu
     config.block.style = config.tree.style
 
-    report(60, "Budowa drzewa warstw...")
+    report(60, tr("Budowa drzewa warstw..."))
     tree = tree_builder.build_tree(
         gpkg, inv, cad_layers, config.tree,
         QgsProject.instance(), feedback,
@@ -152,12 +153,12 @@ def run(config, iface=None, feedback=None, progress_cb=None):
         log(warning, Qgis.Warning)
 
     if config.tree.block_mode == S.BlockMode.COMPOSITE:
-        report(75, "Skladanie blokow...")
+        report(75, tr("Skladanie blokow..."))
         if inv.expanded:
             msg = (
-                "Uwaga: ten GeoPackage wyglada na zaimportowany z rozwinieciem "
+                tr("Uwaga: ten GeoPackage wyglada na zaimportowany z rozwinieciem "
                 "blokow. Definicje blokow moga byc niekompletne — zaimportuj "
-                "ponownie w trybie bez rozwijania."
+                "ponownie w trybie bez rozwijania.")
             )
             log(msg, Qgis.Warning)
             result.messages.append(msg)
@@ -177,6 +178,6 @@ def run(config, iface=None, feedback=None, progress_cb=None):
                 tree.root_group, entries, config.tree, QgsProject.instance()
             )
 
-    report(100, "Gotowe.")
-    log("Import zakonczony: {0}".format(result.summary()))
+    report(100, tr("Gotowe."))
+    log(tr("Import zakonczony: {0}").format(result.summary()))
     return result

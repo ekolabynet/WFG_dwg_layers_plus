@@ -42,6 +42,7 @@ from . import gpkg_schema as S
 from . import naming, styler
 from .affine import insert_matrix, minsert_offsets
 from .qgis_compat import field_type, vector_file_writer_action
+from ..i18n import tr
 
 #: domyslny limit zagniezdzenia blokow
 MAX_DEPTH = 16
@@ -327,7 +328,7 @@ class _Expander(object):
         if block_handle is None:
             self._warn_once(
                 ("missing", insert_row["name"]),
-                "Blok '{0}' nie ma definicji — pominiety.".format(insert_row["name"]),
+                tr("Blok '{0}' nie ma definicji — pominiety.").format(insert_row["name"]),
             )
             return out
         base = self.bases.get(insert_row["name"], (0.0, 0.0, 0.0))
@@ -375,8 +376,8 @@ class _Expander(object):
             return
         self._warned_budget = True
         self.result.warnings.append(
-            "Przekroczono limit {0} encji na wstawienie — czesc geometrii "
-            "blokow zostala pominieta. Podnies limit w oknie importu.".format(
+            tr("Przekroczono limit {0} encji na wstawienie — czesc geometrii "
+            "blokow zostala pominieta. Podnies limit w oknie importu.").format(
                 self.opt.max_entities
             )
         )
@@ -430,7 +431,7 @@ class _Expander(object):
             if child in visited:
                 self._warn_once(
                     ("cycle", row["name"]),
-                    "Wykryto cykl w blokach ('{0}') — rekurencja przerwana.".format(
+                    tr("Wykryto cykl w blokach ('{0}') — rekurencja przerwana.").format(
                         row["name"]
                     ),
                 )
@@ -438,7 +439,7 @@ class _Expander(object):
             if depth + 1 >= self.opt.max_depth:
                 self._warn_once(
                     ("depth", row["name"]),
-                    "Przekroczono limit zagniezdzenia blokow ({0}) przy '{1}'.".format(
+                    tr("Przekroczono limit zagniezdzenia blokow ({0}) przy '{1}'.").format(
                         self.opt.max_depth, row["name"]
                     ),
                 )
@@ -579,19 +580,19 @@ def build_block_layers(
     result = BlockResult()
     names, bases = read_block_index(gpkg_path)
     if not names:
-        result.warnings.append("Brak definicji blokow w pliku.")
+        result.warnings.append(tr("Brak definicji blokow w pliku."))
         return result
 
     defs = read_definitions(gpkg_path, feedback)
     if not defs:
         result.warnings.append(
-            "Definicje blokow sa puste. Czy import zostal wykonany w trybie "
-            "'Add Only Insert Points' (bez rozwijania blokow)?"
+            tr("Definicje blokow sa puste. Czy import zostal wykonany w trybie "
+            "'Add Only Insert Points' (bez rozwijania blokow)?")
         )
 
     inserts = read_top_inserts(gpkg_path, cad_layers)
     if not inserts:
-        result.warnings.append("Brak wstawien blokow w przestrzeni modelu.")
+        result.warnings.append(tr("Brak wstawien blokow w przestrzeni modelu."))
         return result
 
     crs = crs_authid or (inv.crs_authid if inv is not None else None)
@@ -628,7 +629,7 @@ def build_block_layers(
                 )
                 if lyr is None:
                     result.warnings.append(
-                        "Nie udalo sie utworzyc warstwy dla bloku {0}/{1}".format(
+                        tr("Nie udalo sie utworzyc warstwy dla bloku {0}/{1}").format(
                             block_name, kind
                         )
                     )
@@ -676,7 +677,7 @@ def build_block_layers(
                 except Exception:
                     pass
                 result.warnings.append(
-                    "Nie wszystkie obiekty trafily do warstwy {0}: {1}".format(
+                    tr("Nie wszystkie obiekty trafily do warstwy {0}: {1}").format(
                         lyr.name(), "; ".join(errors) or "nieznany blad"
                     )
                 )
@@ -780,12 +781,12 @@ def _persist(gpkg_path, result, style_opts=None):
                 mem, gpkg_path, ctx, opts
             )
         except Exception as exc:  # noqa: BLE001
-            result.warnings.append("Zapis {0}: {1}".format(target, exc))
+            result.warnings.append(tr("Zapis {0}: {1}").format(target, exc))
             replaced.append((block_name, kind, mem))
             continue
         err = written[0] if isinstance(written, (tuple, list)) else written
         if err not in (QgsVectorFileWriter.NoError, 0):
-            result.warnings.append("Zapis {0} nieudany.".format(target))
+            result.warnings.append(tr("Zapis {0} nieudany.").format(target))
             replaced.append((block_name, kind, mem))
             continue
         new = QgsVectorLayer(
@@ -816,4 +817,4 @@ def _persist(gpkg_path, result, style_opts=None):
                 styler.style_anchor(new, style_opts)
                 result.anchor_layer = new
         except Exception as exc:  # noqa: BLE001
-            result.warnings.append("Zapis kotwic: {0}".format(exc))
+            result.warnings.append(tr("Zapis kotwic: {0}").format(exc))

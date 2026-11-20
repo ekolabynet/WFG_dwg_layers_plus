@@ -21,6 +21,7 @@ from qgis.core import QgsProject, QgsSettings
 from qgis.PyQt.QtWidgets import QAction
 
 from . import gpkg_schema as S
+from ..i18n import tr
 
 ACTION_NAME = "mActionDwgImport"
 
@@ -97,9 +98,9 @@ def run_builtin_import(iface, block_mode, use_curves=True, cleanup=True):
     action = find_action(main_window)
     if action is None:
         raise BuiltinImportError(
-            "Nie znaleziono akcji wbudowanego importu DWG/DXF. "
+            tr("Nie znaleziono akcji wbudowanego importu DWG/DXF. "
             "Zaimportuj rysunek recznie (Projekt > Importuj/Eksportuj > "
-            "Importuj warstwy z DWG/DXF), a potem wskaz powstaly plik .gpkg."
+            "Importuj warstwy z DWG/DXF), a potem wskaz powstaly plik .gpkg.")
         )
 
     preset_block_mode(block_mode, use_curves)
@@ -130,8 +131,8 @@ def run_builtin_import(iface, block_mode, use_curves=True, cleanup=True):
 
     if gpkg is None:
         raise BuiltinImportError(
-            "Import nie utworzyl zadnych warstw — anulowano okno albo rysunek "
-            "jest pusty. Mozesz tez wskazac gotowy plik .gpkg recznie."
+            tr("Import nie utworzyl zadnych warstw — anulowano okno albo rysunek "
+            "jest pusty. Mozesz tez wskazac gotowy plik .gpkg recznie.")
         )
     return gpkg
 

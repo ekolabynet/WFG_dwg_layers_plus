@@ -33,6 +33,7 @@ from qgis.PyQt.QtWidgets import (
 )
 
 from ..core import block_attributes as BA
+from ..i18n import tr
 
 SETTINGS_PREFIX = "wfg_dwg_layers_plus/attr/"
 
@@ -44,7 +45,7 @@ class AttributesDialog(QDialog):
         self.scan_result = None
         self.feedback = QgsFeedback()
 
-        self.setWindowTitle("WFG DWG Layers+ — atrybuty bloków")
+        self.setWindowTitle(tr("WFG DWG Layers+ — atrybuty bloków"))
         self.setMinimumWidth(720)
         self.setMinimumHeight(560)
         self._build_ui()
@@ -56,31 +57,31 @@ class AttributesDialog(QDialog):
         root = QVBoxLayout(self)
 
         intro = QLabel(
-            "Biblioteka, której QGIS używa do czytania DWG/DXF, <b>nie obsługuje "
+            tr("Biblioteka, której QGIS używa do czytania DWG/DXF, <b>nie obsługuje "
             "atrybutów bloków</b> — wartości rzędnych, numerów, opisów wpisanych "
             "jako ATTRIB nie ma w GeoPackage w ogóle. Ten moduł czyta je "
             "bezpośrednio z rysunku sterownikiem DXF w GDAL i skleja z importem "
-            "po uchwycie encji (<i>handle</i>)."
+            "po uchwycie encji (<i>handle</i>).")
         )
         intro.setWordWrap(True)
         root.addWidget(intro)
 
-        box = QGroupBox("Pliki")
+        box = QGroupBox(tr("Pliki"))
         form = QFormLayout(box)
 
         row = QHBoxLayout()
         self.ed_dxf = QLineEdit()
-        self.ed_dxf.setPlaceholderText("rysunek .dxf (albo .dwg — wymaga konwertera)")
+        self.ed_dxf.setPlaceholderText(tr("rysunek .dxf (albo .dwg — wymaga konwertera)"))
         btn = QPushButton("…")
         btn.setFixedWidth(32)
         btn.clicked.connect(self._pick_dxf)
         row.addWidget(self.ed_dxf)
         row.addWidget(btn)
-        form.addRow("Rysunek źródłowy:", row)
+        form.addRow(tr("Rysunek źródłowy:"), row)
 
         row2 = QHBoxLayout()
         self.ed_gpkg = QLineEdit()
-        self.ed_gpkg.setPlaceholderText("GeoPackage z importu")
+        self.ed_gpkg.setPlaceholderText(tr("GeoPackage z importu"))
         btn2 = QPushButton("…")
         btn2.setFixedWidth(32)
         btn2.clicked.connect(self._pick_gpkg)
@@ -90,32 +91,32 @@ class AttributesDialog(QDialog):
 
         self.cmb_encoding = QComboBox()
         for label, value in (
-            ("cp1250 — polska strona kodowa (domyślnie)", "cp1250"),
+            (tr("cp1250 — polska strona kodowa (domyślnie)"), "cp1250"),
             ("utf-8", "utf-8"),
-            ("cp1252 — zachodnioeuropejska", "cp1252"),
+            (tr("cp1252 — zachodnioeuropejska"), "cp1252"),
             ("latin-1", "latin-1"),
         ):
             self.cmb_encoding.addItem(label, value)
         self.cmb_encoding.setToolTip(
-            "DXF deklarujący wersję R2018 powinien być w UTF-8, ale wiele "
+            tr("DXF deklarujący wersję R2018 powinien być w UTF-8, ale wiele "
             "CAD-ów zapisuje bajty w stronie kodowej systemu i nie poprawia "
             "nagłówka. Wtedy GDAL oddaje surowe bajty, a znaczniki atrybutów "
             "robią się nieczytelne. Ustawienie ma znaczenie tylko dla takich "
-            "plików — poprawny UTF-8 przechodzi nietknięty."
+            "plików — poprawny UTF-8 przechodzi nietknięty.")
         )
-        form.addRow("Kodowanie tekstu:", self.cmb_encoding)
+        form.addRow(tr("Kodowanie tekstu:"), self.cmb_encoding)
 
         root.addWidget(box)
 
         scan_row = QHBoxLayout()
-        self.btn_scan = QPushButton("Skanuj rysunek")
+        self.btn_scan = QPushButton(tr("Skanuj rysunek"))
         self.btn_scan.clicked.connect(self._scan)
         scan_row.addWidget(self.btn_scan)
         scan_row.addStretch(1)
         root.addLayout(scan_row)
 
         self.table = QTableWidget(0, 3)
-        self.table.setHorizontalHeaderLabels(["Blok", "Wstawień", "Znaczniki"])
+        self.table.setHorizontalHeaderLabels([tr("Blok"), tr("Wstawień"), tr("Znaczniki")])
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
@@ -125,41 +126,41 @@ class AttributesDialog(QDialog):
         header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
         root.addWidget(self.table, 1)
 
-        opts = QGroupBox("Co zrobić z wynikiem")
+        opts = QGroupBox(tr("Co zrobić z wynikiem"))
         olay = QVBoxLayout(opts)
 
         self.cb_only_selected = QCheckBox(
-            "Tylko zaznaczone bloki (puste zaznaczenie = wszystkie)"
+            tr("Tylko zaznaczone bloki (puste zaznaczenie = wszystkie)")
         )
         olay.addWidget(self.cb_only_selected)
 
         self.cb_join = QCheckBox(
-            "Podepnij złączenia do warstw wstawień i kotwic w projekcie"
+            tr("Podepnij złączenia do warstw wstawień i kotwic w projekcie")
         )
         self.cb_join.setChecked(True)
         self.cb_join.setToolTip(
-            "Nieniszczące: atrybuty pojawią się jako dodatkowe pola warstw "
+            tr("Nieniszczące: atrybuty pojawią się jako dodatkowe pola warstw "
             "*_insert i blk__anchor. Złączenie można zdjąć we właściwościach "
-            "warstwy albo przyciskiem poniżej."
+            "warstwy albo przyciskiem poniżej.")
         )
         olay.addWidget(self.cb_join)
 
-        self.cb_add_layer = QCheckBox("Dodaj tabelę atrybutów do projektu")
+        self.cb_add_layer = QCheckBox(tr("Dodaj tabelę atrybutów do projektu"))
         self.cb_add_layer.setChecked(True)
         olay.addWidget(self.cb_add_layer)
 
         limit_row = QHBoxLayout()
-        limit_row.addWidget(QLabel("Maksimum kolumn:"))
+        limit_row.addWidget(QLabel(tr("Maksimum kolumn:")))
         self.sp_columns = QSpinBox()
         self.sp_columns.setRange(1, 500)
         self.sp_columns.setValue(BA.MAX_COLUMNS)
         self.sp_columns.setToolTip(
-            "Powyżej limitu rzadsze znaczniki są pomijane — ostrzeżenie trafia "
-            "do dziennika."
+            tr("Powyżej limitu rzadsze znaczniki są pomijane — ostrzeżenie trafia "
+            "do dziennika.")
         )
         limit_row.addWidget(self.sp_columns)
         limit_row.addStretch(1)
-        self.btn_detach = QPushButton("Zdejmij złączenia")
+        self.btn_detach = QPushButton(tr("Zdejmij złączenia"))
         self.btn_detach.clicked.connect(self._detach)
         limit_row.addWidget(self.btn_detach)
         olay.addLayout(limit_row)
@@ -180,9 +181,9 @@ class AttributesDialog(QDialog):
             Qt.Orientation.Horizontal,
         )
         self.btn_apply = self.buttons.button(QDialogButtonBox.StandardButton.Ok)
-        self.btn_apply.setText("Zastosuj")
+        self.btn_apply.setText(tr("Zastosuj"))
         self.btn_apply.setEnabled(False)
-        self.buttons.button(QDialogButtonBox.StandardButton.Close).setText("Zamknij")
+        self.buttons.button(QDialogButtonBox.StandardButton.Close).setText(tr("Zamknij"))
         self.buttons.accepted.connect(self._apply)
         self.buttons.rejected.connect(self.reject)
         root.addWidget(self.buttons)
@@ -207,15 +208,15 @@ class AttributesDialog(QDialog):
 
     def _pick_dxf(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "Wybierz rysunek", self.ed_dxf.text(),
-            "Rysunki CAD (*.dxf *.DXF *.dwg *.DWG);;Wszystkie pliki (*)",
+            self, tr("Wybierz rysunek"), self.ed_dxf.text(),
+            tr("Rysunki CAD (*.dxf *.DXF *.dwg *.DWG);;Wszystkie pliki (*)"),
         )
         if path:
             self.ed_dxf.setText(path)
 
     def _pick_gpkg(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "Wybierz GeoPackage", self.ed_gpkg.text(), "GeoPackage (*.gpkg)"
+            self, tr("Wybierz GeoPackage"), self.ed_gpkg.text(), "GeoPackage (*.gpkg)"
         )
         if path:
             self.ed_gpkg.setText(path)
@@ -223,7 +224,7 @@ class AttributesDialog(QDialog):
     def _scan(self):
         dxf = self.ed_dxf.text().strip()
         if not dxf or not os.path.exists(dxf):
-            QMessageBox.warning(self, "WFG DWG Layers+", "Wskaż istniejący rysunek.")
+            QMessageBox.warning(self, "WFG DWG Layers+", tr("Wskaż istniejący rysunek."))
             return
 
         self.feedback = QgsFeedback()
@@ -251,7 +252,7 @@ class AttributesDialog(QDialog):
         rows = self.scan_result.block_rows()
         self.table.setRowCount(len(rows))
         for r, (name, count, tags) in enumerate(rows):
-            item = QTableWidgetItem(name or "(bez nazwy)")
+            item = QTableWidgetItem(name or tr("(bez nazwy)"))
             item.setData(Qt.ItemDataRole.UserRole, name)
             self.table.setItem(r, 0, item)
             cell = QTableWidgetItem(str(count))
@@ -263,14 +264,14 @@ class AttributesDialog(QDialog):
 
         tags = self.scan_result.tags()
         komunikat = (
-            "Znaleziono {0} wstawień z atrybutami, {1} bloków, {2} różnych "
-            "znaczników.".format(self.scan_result.total, len(rows), len(tags))
+            tr("Znaleziono {0} wstawień z atrybutami, {1} bloków, {2} różnych "
+            "znaczników.").format(self.scan_result.total, len(rows), len(tags))
         )
         if self.scan_result.recoded:
             komunikat += (
-                "  Rysunek nie jest w UTF-8 — teksty przekodowano jako {0}. "
+                tr("  Rysunek nie jest w UTF-8 — teksty przekodowano jako {0}. "
                 "Jeśli polskie znaki w znacznikach wyglądają źle, zmień "
-                "kodowanie i zeskanuj ponownie.".format(self.scan_result.encoding)
+                "kodowanie i zeskanuj ponownie.").format(self.scan_result.encoding)
             )
         self.status.setText(komunikat)
         self.btn_apply.setEnabled(self.scan_result.total > 0)
@@ -286,11 +287,11 @@ class AttributesDialog(QDialog):
 
     def _apply(self):
         if self.scan_result is None:
-            QMessageBox.warning(self, "WFG DWG Layers+", "Najpierw zeskanuj rysunek.")
+            QMessageBox.warning(self, "WFG DWG Layers+", tr("Najpierw zeskanuj rysunek."))
             return
         gpkg = self.ed_gpkg.text().strip()
         if not gpkg or not os.path.exists(gpkg):
-            QMessageBox.warning(self, "WFG DWG Layers+", "Wskaż istniejący GeoPackage.")
+            QMessageBox.warning(self, "WFG DWG Layers+", tr("Wskaż istniejący GeoPackage."))
             return
 
         wanted = self._selected_blocks()
@@ -325,23 +326,23 @@ class AttributesDialog(QDialog):
 
         if written == 0 and scan_result.total:
             self.status.setText(
-                "Przerwano — nic nie zapisano, poprzedni stan wycofany."
+                tr("Przerwano — nic nie zapisano, poprzedni stan wycofany.")
             )
             QMessageBox.information(
                 self, "WFG DWG Layers+",
-                "Zapis przerwany. Tabela atrybutów nie została utworzona, "
-                "GeoPackage został wycofany do poprzedniego stanu.",
+                tr("Zapis przerwany. Tabela atrybutów nie została utworzona, "
+                "GeoPackage został wycofany do poprzedniego stanu."),
             )
             return
 
         messages = [
-            "Zapisano {0} wierszy do tabeli {1}, kolumn atrybutów: {2}.".format(
+            tr("Zapisano {0} wierszy do tabeli {1}, kolumn atrybutów: {2}.").format(
                 written, BA.TABLE, len(columns)
             )
         ]
         if dropped:
             messages.append(
-                "Pominięto {0} rzadszych znaczników (limit kolumn): {1}".format(
+                tr("Pominięto {0} rzadszych znaczników (limit kolumn): {1}").format(
                     len(dropped), ", ".join(dropped[:8])
                 )
             )
@@ -353,7 +354,7 @@ class AttributesDialog(QDialog):
         if self.cb_join.isChecked():
             join = BA.attach_joins(gpkg, table_layer=table_layer)
             messages.append(
-                "Podpięto złączenia do {0} warstw.".format(len(join.joined))
+                tr("Podpięto złączenia do {0} warstw.").format(len(join.joined))
             )
             messages.extend(join.errors[:5])
             table_layer = join.table_layer or table_layer
@@ -380,8 +381,8 @@ class AttributesDialog(QDialog):
     def _detach(self):
         removed = BA.detach_joins()
         self.status.setText(
-            "Zdjęto złączeń: {0} (tabela atrybutów usunięta z projektu; "
-            "dane w GeoPackage zostają).".format(removed)
+            tr("Zdjęto złączeń: {0} (tabela atrybutów usunięta z projektu; "
+            "dane w GeoPackage zostają).").format(removed)
         )
 
     def _progress(self, pct, message=""):

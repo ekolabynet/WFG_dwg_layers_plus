@@ -31,6 +31,7 @@ import subprocess
 import tempfile
 
 from . import gpkg_schema as S
+from ..i18n import tr
 
 _ODA_CANDIDATES = (
     r"C:\Program Files\ODA\ODAFileConverter\ODAFileConverter.exe",
@@ -90,7 +91,7 @@ def convert_dwg_to_dxf(dwg_path, out_dir=None, version="ACAD2018", timeout=600):
             subprocess.run(cmd, check=True, timeout=timeout,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except Exception as exc:  # noqa: BLE001
-            raise OgrImportError("dwg2dxf nie zadzialal: {0}".format(exc))
+            raise OgrImportError(tr("dwg2dxf nie zadzialal: {0}").format(exc))
         if os.path.exists(target):
             return target
 
@@ -103,14 +104,14 @@ def convert_dwg_to_dxf(dwg_path, out_dir=None, version="ACAD2018", timeout=600):
             subprocess.run(cmd, check=False, timeout=timeout,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except Exception as exc:  # noqa: BLE001
-            raise OgrImportError("ODA File Converter nie zadzialal: {0}".format(exc))
+            raise OgrImportError(tr("ODA File Converter nie zadzialal: {0}").format(exc))
         if os.path.exists(target):
             return target
 
     raise OgrImportError(
-        "Nie znaleziono konwertera DWG -> DXF. Zainstaluj ODA File Converter "
+        tr("Nie znaleziono konwertera DWG -> DXF. Zainstaluj ODA File Converter "
         "(bezplatny, wymaga rejestracji) albo LibreDWG (dwg2dxf), albo uzyj "
-        "wbudowanego importu QGIS, ktory czyta DWG bezposrednio."
+        "wbudowanego importu QGIS, ktory czyta DWG bezposrednio.")
     )
 
 
@@ -256,7 +257,7 @@ def import_dxf(
     try:
         from osgeo import gdal, ogr, osr
     except ImportError as exc:  # noqa: BLE001
-        raise OgrImportError("Brak modulu osgeo (GDAL): {0}".format(exc))
+        raise OgrImportError(tr("Brak modulu osgeo (GDAL): {0}").format(exc))
 
     # Wyjatki GDAL sa globalne dla calego procesu QGIS (od GDAL 3.7 obejmuja
     # tez osgeo.ogr i osgeo.osr), wiec ustawiamy je tylko na czas importu.
@@ -296,7 +297,7 @@ def _import_dxf_inner(
 ):
     src = ogr.Open(dxf_path)
     if src is None:
-        raise OgrImportError("GDAL nie otworzyl pliku: {0}".format(dxf_path))
+        raise OgrImportError(tr("GDAL nie otworzyl pliku: {0}").format(dxf_path))
 
     srs = None
     if crs_authid and crs_authid.upper().startswith("EPSG:"):
@@ -308,14 +309,14 @@ def _import_dxf_inner(
 
     driver = ogr.GetDriverByName("GPKG")
     if driver is None:
-        raise OgrImportError("GDAL bez obslugi GeoPackage.")
+        raise OgrImportError(tr("GDAL bez obslugi GeoPackage."))
 
     # Nie kasujemy cudzych plikow: jesli cel istnieje, dokladamy sufiks.
     # Na Windowsie usuniecie pliku otwartego w projekcie i tak by sie nie udalo.
     gpkg_path = _free_path(gpkg_path)
     dst = driver.CreateDataSource(gpkg_path)
     if dst is None:
-        raise OgrImportError("Nie mozna utworzyc {0}".format(gpkg_path))
+        raise OgrImportError(tr("Nie mozna utworzyc {0}").format(gpkg_path))
 
     out_layers = {}
     geom_types = {

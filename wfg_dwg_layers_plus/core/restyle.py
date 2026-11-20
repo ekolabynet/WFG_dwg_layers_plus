@@ -23,6 +23,7 @@ from qgis.core import QgsProject, QgsVectorLayer
 
 from . import gpkg_schema as S
 from . import styler
+from ..i18n import tr
 
 _LAYERNAME_RE = re.compile(r"layername=([^|]+)", re.IGNORECASE)
 
@@ -177,7 +178,7 @@ def restyle_project(style_options=None, project=None, only_group=None):
         else:
             result.skipped += 1
             result.details.append(
-                "Nie ostylowano: {0} ({1}/{2})".format(layer.name(), kind, what)
+                tr("Nie ostylowano: {0} ({1}/{2})").format(layer.name(), kind, what)
             )
 
     return result

@@ -22,6 +22,7 @@ from qgis.PyQt.QtWidgets import (
 )
 
 from ..core import restyle, styler
+from ..i18n import tr
 
 SETTINGS_PREFIX = "wfg_dwg_layers_plus/"
 
@@ -30,15 +31,15 @@ class RestyleDialog(QDialog):
     def __init__(self, iface, parent=None):
         super(RestyleDialog, self).__init__(parent or iface.mainWindow())
         self.iface = iface
-        self.setWindowTitle("WFG DWG Layers+ — popraw wygląd")
+        self.setWindowTitle(tr("WFG DWG Layers+ — popraw wygląd"))
         self.setMinimumWidth(520)
 
         root = QVBoxLayout(self)
 
         intro = QLabel(
-            "Nakłada style WFG DWG Layers+ na warstwy, które są już w projekcie — "
+            tr("Nakłada style WFG DWG Layers+ na warstwy, które są już w projekcie — "
             "bez ponownego czytania rysunku. Przydatne, gdy część punktów albo "
-            "linii wczytała się z domyślnym wyglądem QGIS."
+            "linii wczytała się z domyślnym wyglądem QGIS.")
         )
         intro.setWordWrap(True)
         root.addWidget(intro)
@@ -51,27 +52,27 @@ class RestyleDialog(QDialog):
         self.sp_line_width.setDecimals(2)
         self.sp_line_width.setSuffix(" mm")
         self.sp_line_width.setToolTip(
-            "Grubość dla encji bez własnej (linewidth 0 albo -1 = BYBLOCK). "
-            "Bez tego QGIS podstawia swoje 0,26 mm."
+            tr("Grubość dla encji bez własnej (linewidth 0 albo -1 = BYBLOCK). "
+            "Bez tego QGIS podstawia swoje 0,26 mm.")
         )
-        form.addRow("Grubość zastępcza linii:", self.sp_line_width)
+        form.addRow(tr("Grubość zastępcza linii:"), self.sp_line_width)
 
         self.cmb_pline_width = QComboBox()
         self.cmb_pline_width.addItem(
-            "jako grubość pisaka w mm (zalecane)", "mm")
+            tr("jako grubość pisaka w mm (zalecane)"), "mm")
         self.cmb_pline_width.addItem(
-            "jako szerokość w terenie, wiernie jak CAD", "map")
+            tr("jako szerokość w terenie, wiernie jak CAD"), "map")
         self.cmb_pline_width.addItem("pomijaj", "ignore")
         self.cmb_pline_width.setToolTip(
-            "Polilinie CAD mają globalną szerokość (kolumna width) w jednostkach "
+            tr("Polilinie CAD mają globalną szerokość (kolumna width) w jednostkach "
             "rysunku. QGIS renderuje ją wiernie — polilinia o width 0,5 wychodzi "
             "na pół metra szeroka, jak czarna belka. Projektanci zwykle wpisują "
             "tam grubości piór ISO (0,05 / 0,1 / 0,3 / 0,5), więc domyślnie "
-            "traktujemy tę liczbę jako milimetry."
+            "traktujemy tę liczbę jako milimetry.")
         )
-        form.addRow("Szerokość polilinii:", self.cmb_pline_width)
+        form.addRow(tr("Szerokość polilinii:"), self.cmb_pline_width)
 
-        self.cb_show_points = QCheckBox("Pokazuj warstwy punktów CAD")
+        self.cb_show_points = QCheckBox(tr("Pokazuj warstwy punktów CAD"))
         form.addRow("", self.cb_show_points)
 
         self.sp_point_size = QDoubleSpinBox()
@@ -79,21 +80,21 @@ class RestyleDialog(QDialog):
         self.sp_point_size.setSingleStep(0.1)
         self.sp_point_size.setDecimals(1)
         self.sp_point_size.setSuffix(" mm")
-        form.addRow("Rozmiar punktów:", self.sp_point_size)
+        form.addRow(tr("Rozmiar punktów:"), self.sp_point_size)
 
         self.sp_insert_size = QDoubleSpinBox()
         self.sp_insert_size.setRange(0.1, 10.0)
         self.sp_insert_size.setSingleStep(0.1)
         self.sp_insert_size.setDecimals(1)
         self.sp_insert_size.setSuffix(" mm")
-        form.addRow("Rozmiar wstawień i kotwic:", self.sp_insert_size)
+        form.addRow(tr("Rozmiar wstawień i kotwic:"), self.sp_insert_size)
 
         self.ed_group = QLineEdit()
-        self.ed_group.setPlaceholderText("puste = cały projekt")
+        self.ed_group.setPlaceholderText(tr("puste = cały projekt"))
         self.ed_group.setToolTip(
-            "Wpisz fragment nazwy grupy, żeby ograniczyć działanie tylko do niej."
+            tr("Wpisz fragment nazwy grupy, żeby ograniczyć działanie tylko do niej.")
         )
-        form.addRow("Tylko grupa zawierająca:", self.ed_group)
+        form.addRow(tr("Tylko grupa zawierająca:"), self.ed_group)
 
         root.addLayout(form)
 
@@ -106,8 +107,8 @@ class RestyleDialog(QDialog):
             | QDialogButtonBox.StandardButton.Close,
             Qt.Orientation.Horizontal,
         )
-        buttons.button(QDialogButtonBox.StandardButton.Apply).setText("Zastosuj")
-        buttons.button(QDialogButtonBox.StandardButton.Close).setText("Zamknij")
+        buttons.button(QDialogButtonBox.StandardButton.Apply).setText(tr("Zastosuj"))
+        buttons.button(QDialogButtonBox.StandardButton.Close).setText(tr("Zamknij"))
         buttons.button(QDialogButtonBox.StandardButton.Apply).clicked.connect(
             self._apply
         )
@@ -138,7 +139,7 @@ class RestyleDialog(QDialog):
         finally:
             QApplication.restoreOverrideCursor()
 
-        msg = "Ostylowano warstw: {0}, pominięto: {1}".format(
+        msg = tr("Ostylowano warstw: {0}, pominięto: {1}").format(
             result.styled, result.skipped
         )
         if result.details:

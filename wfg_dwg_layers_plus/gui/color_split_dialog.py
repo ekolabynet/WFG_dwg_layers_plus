@@ -35,6 +35,7 @@ from ..core import color_split as CS
 from ..core import gpkg_schema as S
 from ..core import encoding_fix as EF
 from ..core import tree_builder
+from ..i18n import tr
 
 SETTINGS_PREFIX = "wfg_dwg_layers_plus/split/"
 
@@ -46,7 +47,7 @@ class ColorSplitDialog(QDialog):
         self.buckets = []
         self.feedback = QgsFeedback()
 
-        self.setWindowTitle("WFG DWG Layers+ — podziel warstwę wg koloru")
+        self.setWindowTitle(tr("WFG DWG Layers+ — podziel warstwę wg koloru"))
         self.setMinimumWidth(860)
         self.setMinimumHeight(620)
         self._build_ui()
@@ -58,15 +59,15 @@ class ColorSplitDialog(QDialog):
         root = QVBoxLayout(self)
 
         intro = QLabel(
-            "Część eksportów wrzuca całą kreskę na warstwę <b>0</b> i rozróżnia "
+            tr("Część eksportów wrzuca całą kreskę na warstwę <b>0</b> i rozróżnia "
             "treść wyłącznie barwą. Podział „warstwa CAD × typ geometrii\" daje "
             "wtedy jedną wielką warstwę. Tu dzielimy po tym, co w takim pliku "
-            "naprawdę niesie znaczenie."
+            "naprawdę niesie znaczenie.")
         )
         intro.setWordWrap(True)
         root.addWidget(intro)
 
-        box = QGroupBox("Źródło")
+        box = QGroupBox(tr("Źródło"))
         form = QFormLayout(box)
 
         row = QHBoxLayout()
@@ -80,31 +81,31 @@ class ColorSplitDialog(QDialog):
 
         self.cmb_layer = QComboBox()
         self.cmb_layer.setEditable(True)
-        form.addRow("Warstwa CAD:", self.cmb_layer)
+        form.addRow(tr("Warstwa CAD:"), self.cmb_layer)
 
         wymiary = QHBoxLayout()
         self.cb_color = QCheckBox("kolor")
         self.cb_color.setChecked(True)
-        self.cb_lweight = QCheckBox("grubość linii")
-        self.cb_etype = QCheckBox("typ encji (łuk / okrąg / odcinek)")
+        self.cb_lweight = QCheckBox(tr("grubość linii"))
+        self.cb_etype = QCheckBox(tr("typ encji (łuk / okrąg / odcinek)"))
         for cb in (self.cb_color, self.cb_lweight, self.cb_etype):
             wymiary.addWidget(cb)
         wymiary.addStretch(1)
-        form.addRow("Dziel według:", wymiary)
+        form.addRow(tr("Dziel według:"), wymiary)
 
         root.addWidget(box)
 
         scan_row = QHBoxLayout()
-        self.btn_scan = QPushButton("Skanuj")
+        self.btn_scan = QPushButton(tr("Skanuj"))
         self.btn_scan.clicked.connect(self._scan)
         scan_row.addWidget(self.btn_scan)
-        scan_row.addWidget(QLabel("Nazwy w ostatniej kolumnie można edytować."))
+        scan_row.addWidget(QLabel(tr("Nazwy w ostatniej kolumnie można edytować.")))
         scan_row.addStretch(1)
         root.addLayout(scan_row)
 
         self.table = QTableWidget(0, 6)
         self.table.setHorizontalHeaderLabels(
-            ["Kolor", "Tabela", "Grubość", "Typ", "Obiektów", "Nazwa warstwy"]
+            [tr("Kolor"), tr("Tabela"), tr("Grubość"), tr("Typ"), tr("Obiektów"), tr("Nazwa warstwy")]
         )
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
@@ -114,19 +115,19 @@ class ColorSplitDialog(QDialog):
         header.setSectionResizeMode(5, QHeaderView.ResizeMode.Stretch)
         root.addWidget(self.table, 1)
 
-        opts = QGroupBox("Po podziale")
+        opts = QGroupBox(tr("Po podziale"))
         olay = QVBoxLayout(opts)
         self.cb_remove = QCheckBox(
-            "Usuń nierozdzieloną warstwę źródłową z projektu (np. 0_pline)"
+            tr("Usuń nierozdzieloną warstwę źródłową z projektu (np. 0_pline)")
         )
         self.cb_remove.setChecked(True)
         self.cb_remove.setToolTip(
-            "Inaczej ta sama geometria byłaby narysowana dwa razy. "
-            "Usuwamy tylko warstwę z projektu — dane w GeoPackage zostają."
+            tr("Inaczej ta sama geometria byłaby narysowana dwa razy. "
+            "Usuwamy tylko warstwę z projektu — dane w GeoPackage zostają.")
         )
         olay.addWidget(self.cb_remove)
         self.cb_remember = QCheckBox(
-            "Zapamiętaj nazwy dla tych kolorów (przydadzą się przy następnym pliku)"
+            tr("Zapamiętaj nazwy dla tych kolorów (przydadzą się przy następnym pliku)")
         )
         self.cb_remember.setChecked(True)
         olay.addWidget(self.cb_remember)
@@ -142,9 +143,9 @@ class ColorSplitDialog(QDialog):
             Qt.Orientation.Horizontal,
         )
         self.btn_apply = self.buttons.button(QDialogButtonBox.StandardButton.Ok)
-        self.btn_apply.setText("Podziel")
+        self.btn_apply.setText(tr("Podziel"))
         self.btn_apply.setEnabled(False)
-        self.buttons.button(QDialogButtonBox.StandardButton.Close).setText("Zamknij")
+        self.buttons.button(QDialogButtonBox.StandardButton.Close).setText(tr("Zamknij"))
         self.buttons.accepted.connect(self._apply)
         self.buttons.rejected.connect(self.reject)
         root.addWidget(self.buttons)
@@ -162,7 +163,7 @@ class ColorSplitDialog(QDialog):
 
     def _pick_gpkg(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "Wybierz GeoPackage", self.ed_gpkg.text(), "GeoPackage (*.gpkg)"
+            self, tr("Wybierz GeoPackage"), self.ed_gpkg.text(), "GeoPackage (*.gpkg)"
         )
         if path:
             self.ed_gpkg.setText(path)
@@ -182,7 +183,7 @@ class ColorSplitDialog(QDialog):
             QApplication.restoreOverrideCursor()
         for layer, n_colors, n_rows in kandydaci:
             self.cmb_layer.addItem(
-                "{0}  ({1} kolorów, {2} obiektów)".format(layer, n_colors, n_rows),
+                tr("{0}  ({1} kolorów, {2} obiektów)").format(layer, n_colors, n_rows),
                 layer,
             )
         if not kandydaci:
@@ -203,12 +204,12 @@ class ColorSplitDialog(QDialog):
     def _scan(self):
         gpkg = self.ed_gpkg.text().strip()
         if not gpkg or not os.path.exists(gpkg):
-            QMessageBox.warning(self, "WFG DWG Layers+", "Wskaż istniejący GeoPackage.")
+            QMessageBox.warning(self, "WFG DWG Layers+", tr("Wskaż istniejący GeoPackage."))
             return
         if not (self.cb_color.isChecked() or self.cb_lweight.isChecked()
                 or self.cb_etype.isChecked()):
             QMessageBox.warning(
-                self, "WFG DWG Layers+", "Zaznacz przynajmniej jeden wymiar podziału."
+                self, "WFG DWG Layers+", tr("Zaznacz przynajmniej jeden wymiar podziału.")
             )
             return
 
@@ -262,13 +263,13 @@ class ColorSplitDialog(QDialog):
 
             nazwa = QTableWidgetItem(bucket.name or "")
             nazwa.setToolTip(
-                "Puste = nazwa automatyczna: {0}".format(bucket.auto_name())
+                tr("Puste = nazwa automatyczna: {0}").format(bucket.auto_name())
             )
             self.table.setItem(r, 5, nazwa)
 
         self.status.setText(
-            "Znaleziono {0} kombinacji. Wpisz nazwy albo zostaw puste — "
-            "wtedy powstaną nazwy automatyczne.".format(len(self.buckets))
+            tr("Znaleziono {0} kombinacji. Wpisz nazwy albo zostaw puste — "
+            "wtedy powstaną nazwy automatyczne.").format(len(self.buckets))
         )
         self.btn_apply.setEnabled(bool(self.buckets))
 
@@ -352,9 +353,9 @@ class ColorSplitDialog(QDialog):
                     )
         QgsSettings().setValue(SETTINGS_PREFIX + "gpkg", gpkg)
 
-        komunikat = "Utworzono warstw: {0}.".format(wynik.count)
+        komunikat = tr("Utworzono warstw: {0}.").format(wynik.count)
         if usunieto:
-            komunikat += " Usunięto nierozdzielonych: {0}.".format(usunieto)
+            komunikat += tr(" Usunięto nierozdzielonych: {0}.").format(usunieto)
         if wynik.warnings:
             komunikat += "\n" + "\n".join(wynik.warnings[:5])
         self.status.setText(komunikat)

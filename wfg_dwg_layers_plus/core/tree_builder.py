@@ -11,6 +11,7 @@ from qgis.core import QgsProject, QgsVectorLayer
 
 from . import gpkg_schema as S
 from . import naming, styler
+from ..i18n import tr
 
 
 class TreeOptions(object):
@@ -119,7 +120,7 @@ def build_tree(
             )
             if layer is None or not layer.isValid():
                 result.warnings.append(
-                    "Nie udalo sie utworzyc warstwy {0} / {1}".format(
+                    tr("Nie udalo sie utworzyc warstwy {0} / {1}").format(
                         info.name, table
                     )
                 )

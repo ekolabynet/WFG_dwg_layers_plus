@@ -29,6 +29,7 @@ import sqlite3
 
 from . import gpkg_schema as S
 from .encoding_fix import _connect, backup  # noqa: F401  (backup re-eksport)
+from ..i18n import tr
 
 #: encje złożone: mają części składowe zamknięte przez ``SEQEND``
 COMPOSITE_TYPES = frozenset(("POLYLINE", "INSERT"))
@@ -126,7 +127,7 @@ def scan_dxf(path, encoding=None, feedback=None, progress_cb=None):
     with open(path, "rb") as fh:
         if fh.read(len(BINARY_MAGIC)) == BINARY_MAGIC:
             raise ValueError(
-                "To binarny DXF. Zapisz rysunek jako DXF tekstowy (ASCII)."
+                tr("To binarny DXF. Zapisz rysunek jako DXF tekstowy (ASCII).")
             )
 
     rozmiar = max(1, os.path.getsize(path))
@@ -342,12 +343,12 @@ def plan(gpkg_path, scan, tables=None, sample=6, skip_block_content=True):
 
     if not scan.handles:
         out.warnings.append(
-            "Rysunek nie ma uchwytów encji (bardzo stary DXF) — "
-            "po uchwycie nie da się nic dopasować."
+            tr("Rysunek nie ma uchwytów encji (bardzo stary DXF) — "
+            "po uchwycie nie da się nic dopasować.")
         )
     elif not out.changed:
         out.warnings.append(
-            "Nie ma czego poprawiać: przypisanie w bazie zgadza się z rysunkiem."
+            tr("Nie ma czego poprawiać: przypisanie w bazie zgadza się z rysunkiem.")
         )
     return out
 
@@ -402,8 +403,8 @@ def apply_fix(gpkg_path, scan, tables=None, make_backup=True,
         return 0, None
     if getattr(scan, "cancelled", False):
         raise RuntimeError(
-            "Czytanie rysunku zostało przerwane — mapa uchwytów jest niepełna. "
-            "Uruchom sprawdzenie jeszcze raz."
+            tr("Czytanie rysunku zostało przerwane — mapa uchwytów jest niepełna. "
+            "Uruchom sprawdzenie jeszcze raz.")
         )
 
     kopia = backup(gpkg_path) if make_backup else None
@@ -450,7 +451,7 @@ def apply_fix(gpkg_path, scan, tables=None, make_backup=True,
                 zmian += kursor.rowcount if kursor.rowcount > 0 else 0
             except sqlite3.Error as exc:
                 raise RuntimeError(
-                    "Nie udało się poprawić tabeli {0}: {1}".format(table, exc)
+                    tr("Nie udało się poprawić tabeli {0}: {1}").format(table, exc)
                 )
             if progress_cb is not None:
                 progress_cb(int((i + 1) * 100 / len(tables)))

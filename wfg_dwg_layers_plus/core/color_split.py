@@ -31,6 +31,7 @@ except ImportError:  # pragma: no cover — Python 2
     from urllib import pathname2url
 
 from . import gpkg_schema as S
+from ..i18n import tr
 
 #: nazwy typów encji, które w praktyce warto rozdzielić
 ETYPE_NAMES = {
@@ -172,7 +173,7 @@ def _connect(gpkg_path):
     """
     if not os.path.exists(gpkg_path):
         raise sqlite3.OperationalError(
-            "Nie ma takiego pliku: {0}".format(gpkg_path)
+            tr("Nie ma takiego pliku: {0}").format(gpkg_path)
         )
     return sqlite3.connect(
         "file:{0}?mode=ro".format(pathname2url(os.path.abspath(gpkg_path))),
@@ -347,7 +348,7 @@ def build_layers(gpkg_path, cad_layer, buckets, tree_options,
             "{0}|layername={1}".format(gpkg_path, bucket.table), nazwa, "ogr"
         )
         if not layer.isValid():
-            result.warnings.append("Nie udało się otworzyć tabeli {0}".format(bucket.table))
+            result.warnings.append(tr("Nie udało się otworzyć tabeli {0}").format(bucket.table))
             continue
         if not layer.setSubsetString(bucket.filter_sql(cad_layer)):
             result.warnings.append("Filtr odrzucony dla {0}".format(nazwa))

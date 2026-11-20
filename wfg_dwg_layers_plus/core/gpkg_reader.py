@@ -14,6 +14,7 @@ import os
 import sqlite3
 
 from . import gpkg_schema as S
+from ..i18n import tr
 
 
 class CadLayerInfo(object):
@@ -109,7 +110,7 @@ class GpkgReadError(Exception):
 
 def _connect(path):
     if not os.path.exists(path):
-        raise GpkgReadError("Plik nie istnieje: {0}".format(path))
+        raise GpkgReadError(tr("Plik nie istnieje: {0}").format(path))
     uri = "file:{0}?mode=ro".format(path.replace("?", "%3f").replace("#", "%23"))
     try:
         return sqlite3.connect(uri, uri=True)
@@ -152,7 +153,7 @@ def inventory(path, feedback=None):
         missing = [t for t in S.REQUIRED_TABLES if t not in present]
         if missing:
             raise GpkgReadError(
-                "To nie jest GeoPackage z importu DWG/DXF — brakuje tabel: {0}".format(
+                tr("To nie jest GeoPackage z importu DWG/DXF — brakuje tabel: {0}").format(
                     ", ".join(missing)
                 )
             )
@@ -174,7 +175,7 @@ def inventory(path, feedback=None):
             if table not in present:
                 continue
             if feedback is not None and feedback.isCanceled():
-                raise GpkgReadError("Przerwano.")
+                raise GpkgReadError(tr("Przerwano."))
             sql = "SELECT {0}, COUNT(*) FROM {1} WHERE {2} GROUP BY {0}".format(
                 S.C_LAYER, table, S.BASE_FILTER
             )

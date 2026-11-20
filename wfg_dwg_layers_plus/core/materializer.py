@@ -17,6 +17,7 @@ from qgis.core import (
 from . import gpkg_schema as S
 from . import gpkg_reader, naming
 from .qgis_compat import vector_file_writer_action
+from ..i18n import tr
 
 
 class MaterializeResult(object):
@@ -78,7 +79,7 @@ def materialize(
             "{0}|layername={1}".format(gpkg_path, table), "src", "ogr"
         )
         if not src.isValid():
-            result.errors.append("Nie mozna otworzyc tabeli {0}".format(table))
+            result.errors.append(tr("Nie mozna otworzyc tabeli {0}").format(table))
             continue
         src.setSubsetString(S.layer_filter(info.name))
 
@@ -158,7 +159,7 @@ def _write_mapping_table(gpkg_path, mapping, errors):
     try:
         conn = sqlite3.connect(gpkg_path)
     except sqlite3.Error as exc:
-        errors.append("Nie zapisano tabeli mapowania: {0}".format(exc))
+        errors.append(tr("Nie zapisano tabeli mapowania: {0}").format(exc))
         return
     try:
         conn.execute(
@@ -174,7 +175,7 @@ def _write_mapping_table(gpkg_path, mapping, errors):
         )
         conn.commit()
     except sqlite3.Error as exc:
-        errors.append("Nie zapisano tabeli mapowania: {0}".format(exc))
+        errors.append(tr("Nie zapisano tabeli mapowania: {0}").format(exc))
     finally:
         conn.close()
 

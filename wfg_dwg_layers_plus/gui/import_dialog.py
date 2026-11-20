@@ -39,6 +39,7 @@ from qgis.PyQt.QtWidgets import (
 )
 
 from ..core import gpkg_reader, gpkg_schema as S, producer_ogr, runner, styler
+from ..i18n import tr
 
 SETTINGS_PREFIX = "wfg_dwg_layers_plus/"
 
@@ -51,7 +52,7 @@ class ImportDialog(QDialog):
         self.feedback = QgsFeedback()
         self.result_obj = None
 
-        self.setWindowTitle("WFG DWG Layers+ — import")
+        self.setWindowTitle(tr("WFG DWG Layers+ — import"))
         self.setMinimumWidth(760)
         self.setMinimumHeight(620)
         self._build_ui()
@@ -82,47 +83,47 @@ class ImportDialog(QDialog):
         self.buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel, Qt.Orientation.Horizontal
         )
-        self.buttons.button(QDialogButtonBox.StandardButton.Ok).setText("Importuj")
+        self.buttons.button(QDialogButtonBox.StandardButton.Ok).setText(tr("Importuj"))
         self.buttons.accepted.connect(self._on_accept)
         self.buttons.rejected.connect(self._on_reject)
         root.addWidget(self.buttons)
 
     def _source_box(self):
-        box = QGroupBox("Źródło")
+        box = QGroupBox(tr("Źródło"))
         form = QFormLayout(box)
 
         row = QHBoxLayout()
         self.ed_source = QLineEdit()
         self.ed_source.setPlaceholderText(
-            "plik .dwg / .dxf albo gotowy .gpkg z wbudowanego importu"
+            tr("plik .dwg / .dxf albo gotowy .gpkg z wbudowanego importu")
         )
         btn = QPushButton("…")
         btn.setFixedWidth(32)
         btn.clicked.connect(self._pick_source)
         row.addWidget(self.ed_source)
         row.addWidget(btn)
-        form.addRow("Rysunek / GeoPackage:", row)
+        form.addRow(tr("Rysunek / GeoPackage:"), row)
 
         row2 = QHBoxLayout()
         self.ed_gpkg = QLineEdit()
-        self.ed_gpkg.setPlaceholderText("domyślnie obok pliku źródłowego")
+        self.ed_gpkg.setPlaceholderText(tr("domyślnie obok pliku źródłowego"))
         btn2 = QPushButton("…")
         btn2.setFixedWidth(32)
         btn2.clicked.connect(self._pick_gpkg)
         row2.addWidget(self.ed_gpkg)
         row2.addWidget(btn2)
-        form.addRow("Wyjściowy GeoPackage:", row2)
+        form.addRow(tr("Wyjściowy GeoPackage:"), row2)
 
         self.crs_widget = QgsProjectionSelectionWidget()
-        form.addRow("Układ współrzędnych:", self.crs_widget)
+        form.addRow(tr("Układ współrzędnych:"), self.crs_widget)
 
-        self.cb_curves = QCheckBox("Zachowaj łuki (bez segmentyzacji)")
+        self.cb_curves = QCheckBox(tr("Zachowaj łuki (bez segmentyzacji)"))
         self.cb_curves.setChecked(True)
         form.addRow("", self.cb_curves)
 
         self.cb_own_importer = QCheckBox(
-            "Własny import przez GDAL (eksperymentalny; DXF bez zależności, "
-            "DWG wymaga ODA File Converter lub LibreDWG)"
+            tr("Własny import przez GDAL (eksperymentalny; DXF bez zależności, "
+            "DWG wymaga ODA File Converter lub LibreDWG)")
         )
         self.cb_own_importer.toggled.connect(self._update_enabled)
         form.addRow("", self.cb_own_importer)
@@ -134,21 +135,21 @@ class ImportDialog(QDialog):
         return box
 
     def _layers_box(self):
-        box = QGroupBox("Warstwy CAD")
+        box = QGroupBox(tr("Warstwy CAD"))
         lay = QVBoxLayout(box)
 
         top = QHBoxLayout()
-        self.btn_scan = QPushButton("Wczytaj listę warstw")
+        self.btn_scan = QPushButton(tr("Wczytaj listę warstw"))
         self.btn_scan.clicked.connect(self._scan)
         top.addWidget(self.btn_scan)
         self.ed_filter = QLineEdit()
-        self.ed_filter.setPlaceholderText("filtruj po nazwie…")
+        self.ed_filter.setPlaceholderText(tr("filtruj po nazwie…"))
         self.ed_filter.textChanged.connect(self._apply_filter)
         top.addWidget(self.ed_filter, 1)
         for label, slot in (
-            ("Wszystkie", lambda: self._set_all(True)),
-            ("Żadna", lambda: self._set_all(False)),
-            ("Tylko widoczne w CAD", self._select_visible),
+            (tr("Wszystkie"), lambda: self._set_all(True)),
+            (tr("Żadna"), lambda: self._set_all(False)),
+            (tr("Tylko widoczne w CAD"), self._select_visible),
         ):
             b = QPushButton(label)
             b.clicked.connect(slot)
@@ -157,8 +158,8 @@ class ImportDialog(QDialog):
 
         self.table = QTableWidget(0, 8)
         self.table.setHorizontalHeaderLabels(
-            ["Warstwa CAD", "Poligony", "Linie", "Polilinie", "Punkty",
-             "Teksty", "Wstawienia", "Razem"]
+            [tr("Warstwa CAD"), tr("Poligony"), tr("Linie"), tr("Polilinie"), tr("Punkty"),
+             tr("Teksty"), tr("Wstawienia"), tr("Razem")]
         )
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
@@ -172,44 +173,44 @@ class ImportDialog(QDialog):
         return box
 
     def _structure_box(self):
-        box = QGroupBox("Struktura")
+        box = QGroupBox(tr("Struktura"))
         lay = QVBoxLayout(box)
 
-        self.rb_filter = QRadioButton("Filtry na wspólnej tabeli (szybko)")
-        self.rb_materialize = QRadioButton("Osobne tabele w GeoPackage")
+        self.rb_filter = QRadioButton(tr("Filtry na wspólnej tabeli (szybko)"))
+        self.rb_materialize = QRadioButton(tr("Osobne tabele w GeoPackage"))
         self.rb_filter.setChecked(True)
         self.rb_materialize.toggled.connect(self._update_enabled)
         lay.addWidget(self.rb_filter)
         lay.addWidget(self.rb_materialize)
 
-        self.cb_segmentize = QCheckBox("Przy materializacji zamień łuki na odcinki")
+        self.cb_segmentize = QCheckBox(tr("Przy materializacji zamień łuki na odcinki"))
         lay.addWidget(self.cb_segmentize)
 
         self.cb_rebuild_names = QCheckBox(
-            "Przebuduj nazwy tabel (zamiast nadpisać te z poprzedniego importu)"
+            tr("Przebuduj nazwy tabel (zamiast nadpisać te z poprzedniego importu)")
         )
         self.cb_rebuild_names.setToolTip(
-            "Domyślnie powtórzony import nadpisuje tabele utworzone poprzednio, "
+            tr("Domyślnie powtórzony import nadpisuje tabele utworzone poprzednio, "
             "więc plik nie puchnie. Zaznacz, jeśli zmieniłeś sufiksy i chcesz, "
-            "żeby powstały tabele o nowych nazwach."
+            "żeby powstały tabele o nowych nazwach.")
         )
         lay.addWidget(self.cb_rebuild_names)
 
-        self.cb_numbered = QCheckBox("Numeruj grupy (stała kolejność w legendzie)")
+        self.cb_numbered = QCheckBox(tr("Numeruj grupy (stała kolejność w legendzie)"))
         self.cb_numbered.setChecked(True)
         lay.addWidget(self.cb_numbered)
 
-        self.cb_skip_empty = QCheckBox("Pomijaj puste warstwy")
+        self.cb_skip_empty = QCheckBox(tr("Pomijaj puste warstwy"))
         self.cb_skip_empty.setChecked(True)
         lay.addWidget(self.cb_skip_empty)
 
         self.cb_import_invisible = QCheckBox(
-            "Wczytuj warstwy wyłączone/zamrożone w CAD (odznaczone w legendzie)"
+            tr("Wczytuj warstwy wyłączone/zamrożone w CAD (odznaczone w legendzie)")
         )
         self.cb_import_invisible.setChecked(True)
         lay.addWidget(self.cb_import_invisible)
 
-        self.cb_color_by_layer = QCheckBox("Koloruj wg warstwy CAD, nie wg encji")
+        self.cb_color_by_layer = QCheckBox(tr("Koloruj wg warstwy CAD, nie wg encji"))
         lay.addWidget(self.cb_color_by_layer)
 
         look = QFormLayout()
@@ -222,31 +223,31 @@ class ImportDialog(QDialog):
         self.sp_line_width.setSuffix(" mm")
         self.sp_line_width.setValue(0.10)
         self.sp_line_width.setToolTip(
-            "Grubość używana tam, gdzie encja CAD nie ma własnej (linewidth 0 "
+            tr("Grubość używana tam, gdzie encja CAD nie ma własnej (linewidth 0 "
             "albo -1 = BYBLOCK). Bez tego QGIS podstawia swoje domyślne 0,26 mm "
-            "i linie wychodzą za grube."
+            "i linie wychodzą za grube.")
         )
-        look.addRow("Grubość zastępcza linii:", self.sp_line_width)
+        look.addRow(tr("Grubość zastępcza linii:"), self.sp_line_width)
 
         self.cmb_pline_width = QComboBox()
         self.cmb_pline_width.addItem(
-            "jako grubość pisaka w mm (zalecane)", "mm")
+            tr("jako grubość pisaka w mm (zalecane)"), "mm")
         self.cmb_pline_width.addItem(
-            "jako szerokość w terenie, wiernie jak CAD", "map")
+            tr("jako szerokość w terenie, wiernie jak CAD"), "map")
         self.cmb_pline_width.addItem("pomijaj", "ignore")
         self.cmb_pline_width.setToolTip(
-            "Polilinie CAD mają globalną szerokość (kolumna width) w jednostkach "
+            tr("Polilinie CAD mają globalną szerokość (kolumna width) w jednostkach "
             "rysunku. QGIS renderuje ją wiernie — polilinia o width 0,5 wychodzi "
             "na pół metra szeroka, jak czarna belka. Projektanci zwykle wpisują "
             "tam grubości piór ISO (0,05 / 0,1 / 0,3 / 0,5), więc domyślnie "
-            "traktujemy tę liczbę jako milimetry."
+            "traktujemy tę liczbę jako milimetry.")
         )
-        look.addRow("Szerokość polilinii:", self.cmb_pline_width)
+        look.addRow(tr("Szerokość polilinii:"), self.cmb_pline_width)
 
-        self.cb_show_points = QCheckBox("Pokazuj warstwy punktów CAD")
+        self.cb_show_points = QCheckBox(tr("Pokazuj warstwy punktów CAD"))
         self.cb_show_points.setToolTip(
-            "Domyślnie punkty CAD są niewidoczne — tak samo jak we wbudowanym "
-            "imporcie QGIS."
+            tr("Domyślnie punkty CAD są niewidoczne — tak samo jak we wbudowanym "
+            "imporcie QGIS.")
         )
         look.addRow("", self.cb_show_points)
 
@@ -256,7 +257,7 @@ class ImportDialog(QDialog):
         self.sp_point_size.setDecimals(1)
         self.sp_point_size.setSuffix(" mm")
         self.sp_point_size.setValue(0.8)
-        look.addRow("Rozmiar punktów:", self.sp_point_size)
+        look.addRow(tr("Rozmiar punktów:"), self.sp_point_size)
 
         self.sp_insert_size = QDoubleSpinBox()
         self.sp_insert_size.setRange(0.1, 10.0)
@@ -264,7 +265,7 @@ class ImportDialog(QDialog):
         self.sp_insert_size.setDecimals(1)
         self.sp_insert_size.setSuffix(" mm")
         self.sp_insert_size.setValue(1.2)
-        look.addRow("Rozmiar wstawień i kotwic:", self.sp_insert_size)
+        look.addRow(tr("Rozmiar wstawień i kotwic:"), self.sp_insert_size)
 
         lay.addLayout(look)
 
@@ -275,13 +276,13 @@ class ImportDialog(QDialog):
         return box
 
     def _blocks_box(self):
-        box = QGroupBox("Bloki")
+        box = QGroupBox(tr("Bloki"))
         lay = QVBoxLayout(box)
 
-        self.rb_exploded = QRadioButton("Rozbite na geometrie (jak dotąd)")
-        self.rb_inserts = QRadioButton("Punkty wstawień z atrybutami")
+        self.rb_exploded = QRadioButton(tr("Rozbite na geometrie (jak dotąd)"))
+        self.rb_inserts = QRadioButton(tr("Punkty wstawień z atrybutami"))
         self.rb_composite = QRadioButton(
-            "Złożone geometrie — jeden obiekt na wstawienie"
+            tr("Złożone geometrie — jeden obiekt na wstawienie")
         )
         self.rb_exploded.setChecked(True)
         for rb in (self.rb_exploded, self.rb_inserts, self.rb_composite):
@@ -292,43 +293,43 @@ class ImportDialog(QDialog):
         form = QFormLayout(self.composite_panel)
         form.setContentsMargins(18, 4, 0, 0)
 
-        self.cb_anchors = QCheckBox("Utwórz warstwę kotwic (punkt na wstawienie)")
+        self.cb_anchors = QCheckBox(tr("Utwórz warstwę kotwic (punkt na wstawienie)"))
         self.cb_anchors.setChecked(True)
         form.addRow("", self.cb_anchors)
 
-        self.cb_store = QCheckBox("Zapisz warstwy bloków w GeoPackage")
+        self.cb_store = QCheckBox(tr("Zapisz warstwy bloków w GeoPackage"))
         self.cb_store.setChecked(True)
         form.addRow("", self.cb_store)
 
-        self.cb_minsert = QCheckBox("Rozwijaj tablice MINSERT")
+        self.cb_minsert = QCheckBox(tr("Rozwijaj tablice MINSERT"))
         self.cb_minsert.setChecked(True)
         form.addRow("", self.cb_minsert)
 
-        self.cb_layer0 = QCheckBox("Dziedzicz warstwę 0 z wstawienia")
+        self.cb_layer0 = QCheckBox(tr("Dziedzicz warstwę 0 z wstawienia"))
         self.cb_layer0.setChecked(True)
         form.addRow("", self.cb_layer0)
 
         self.cb_qgis_order = QCheckBox(
-            "Kolejność transformacji jak w QGIS (obrót przed skalą)"
+            tr("Kolejność transformacji jak w QGIS (obrót przed skalą)")
         )
         form.addRow("", self.cb_qgis_order)
 
         self.sp_depth = QSpinBox()
         self.sp_depth.setRange(1, 64)
         self.sp_depth.setValue(16)
-        form.addRow("Limit zagnieżdżenia:", self.sp_depth)
+        form.addRow(tr("Limit zagnieżdżenia:"), self.sp_depth)
 
         self.sp_entities = QSpinBox()
         self.sp_entities.setRange(1000, 10000000)
         self.sp_entities.setSingleStep(1000)
         self.sp_entities.setValue(50000)
-        form.addRow("Limit encji na wstawienie:", self.sp_entities)
+        form.addRow(tr("Limit encji na wstawienie:"), self.sp_entities)
 
         lay.addWidget(self.composite_panel)
 
         note = QLabel(
-            "Tryb złożonych geometrii wymaga importu <b>bez rozwijania bloków</b>. "
-            "Wtyczka ustawia to za Ciebie w oknie wbudowanego importu."
+            tr("Tryb złożonych geometrii wymaga importu <b>bez rozwijania bloków</b>. "
+            "Wtyczka ustawia to za Ciebie w oknie wbudowanego importu.")
         )
         note.setWordWrap(True)
         lay.addWidget(note)
@@ -343,8 +344,8 @@ class ImportDialog(QDialog):
             SETTINGS_PREFIX + "lastDir", ""
         )
         path, _ = QFileDialog.getOpenFileName(
-            self, "Wybierz rysunek lub GeoPackage", start,
-            "CAD i GeoPackage (*.dwg *.DWG *.dxf *.DXF *.gpkg);;Wszystkie pliki (*)",
+            self, tr("Wybierz rysunek lub GeoPackage"), start,
+            tr("CAD i GeoPackage (*.dwg *.DWG *.dxf *.DXF *.gpkg);;Wszystkie pliki (*)"),
         )
         if not path:
             return
@@ -358,7 +359,7 @@ class ImportDialog(QDialog):
 
     def _pick_gpkg(self):
         path, _ = QFileDialog.getSaveFileName(
-            self, "Wyjściowy GeoPackage", self.ed_gpkg.text(), "GeoPackage (*.gpkg)"
+            self, tr("Wyjściowy GeoPackage"), self.ed_gpkg.text(), "GeoPackage (*.gpkg)"
         )
         if path:
             if not path.lower().endswith(".gpkg"):
@@ -376,12 +377,12 @@ class ImportDialog(QDialog):
             if producer_ogr.dwg_converter_available():
                 which = producer_ogr.find_oda_converter() or producer_ogr.find_libredwg()
                 self.lbl_converter.setText(
-                    "Konwerter DWG wykryty: {0}".format(which)
+                    tr("Konwerter DWG wykryty: {0}").format(which)
                 )
             else:
                 self.lbl_converter.setText(
-                    "Nie wykryto konwertera DWG → DXF. Pliki DXF zaimportują się "
-                    "bez niego; dla DWG użyj wbudowanego importu."
+                    tr("Nie wykryto konwertera DWG → DXF. Pliki DXF zaimportują się "
+                    "bez niego; dla DWG użyj wbudowanego importu.")
                 )
             if composite:
                 self.rb_exploded.setChecked(True)
@@ -392,13 +393,13 @@ class ImportDialog(QDialog):
     def _scan(self):
         source = self.ed_source.text().strip()
         if not source:
-            self._warn("Wskaż plik źródłowy.")
+            self._warn(tr("Wskaż plik źródłowy."))
             return
         if not source.lower().endswith(".gpkg"):
             self._warn(
-                "Listę warstw można wczytać dopiero z GeoPackage. Uruchom import "
+                tr("Listę warstw można wczytać dopiero z GeoPackage. Uruchom import "
                 "— po jego zakończeniu warstwy pojawią się automatycznie — albo "
-                "wskaż gotowy plik .gpkg."
+                "wskaż gotowy plik .gpkg.")
             )
             return
         try:
@@ -434,9 +435,9 @@ class ImportDialog(QDialog):
             total.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             self.table.setItem(r, 7, total)
         self.status.setText(
-            "Warstw CAD: {0}, bloków: {1}, wstawień: {2}{3}".format(
+            tr("Warstw CAD: {0}, bloków: {1}, wstawień: {2}{3}").format(
                 len(rows), len(inv.block_names), inv.insert_count,
-                "  (import wygląda na wykonany z rozwijaniem bloków)"
+                tr("  (import wygląda na wykonany z rozwijaniem bloków)")
                 if inv.expanded else "",
             )
         )
@@ -526,12 +527,12 @@ class ImportDialog(QDialog):
     def _on_accept(self):
         source = self.ed_source.text().strip()
         if not source or not os.path.exists(source):
-            self._warn("Wskaż istniejący plik źródłowy.")
+            self._warn(tr("Wskaż istniejący plik źródłowy."))
             return
         if self.table.rowCount() and not self.selected_layers():
             self._warn(
-                "Nie zaznaczono żadnej warstwy CAD. Zaznacz przynajmniej jedną "
-                "albo użyj przycisku „Wszystkie”."
+                tr("Nie zaznaczono żadnej warstwy CAD. Zaznacz przynajmniej jedną "
+                "albo użyj przycisku „Wszystkie”.")
             )
             return
 
@@ -553,7 +554,7 @@ class ImportDialog(QDialog):
             # zdjeloby kursor ustawiony przez sam QGIS
             self.progress.setVisible(False)
             self.buttons.setEnabled(True)
-            runner.log("Blad importu: {0}".format(exc))
+            runner.log(tr("Blad importu: {0}").format(exc))
             self._warn(str(exc))
             return
         finally:
@@ -567,7 +568,7 @@ class ImportDialog(QDialog):
             self._populate(self.result_obj.inventory)
             self.ed_source.setText(self.result_obj.gpkg_path)
 
-        msg = "Zaimportowano: {0}".format(self.result_obj.summary())
+        msg = tr("Zaimportowano: {0}").format(self.result_obj.summary())
         extra = self.result_obj.messages
         if self.result_obj.blocks is not None:
             extra = extra + sorted(set(self.result_obj.blocks.warnings))[:5]
@@ -664,14 +665,14 @@ class _AdvancedNames(QGroupBox):
     """Nazwy grup i sufiksy — zwiniete, bo rzadko sie je zmienia."""
 
     def __init__(self, parent=None):
-        super(_AdvancedNames, self).__init__("Nazwy grup i sufiksy", parent)
+        super(_AdvancedNames, self).__init__(tr("Nazwy grup i sufiksy"), parent)
         self.setCheckable(True)
         self.setChecked(False)
         grid = QGridLayout(self)
         self.group_edits = {}
         self.suffix_edits = {}
 
-        grid.addWidget(QLabel("<b>Grupy</b>"), 0, 0, 1, 2)
+        grid.addWidget(QLabel(tr("<b>Grupy</b>")), 0, 0, 1, 2)
         labels = {S.KIND_TEXT: "teksty", S.KIND_POINT: "punkty",
                   S.KIND_LINE: "linie", S.KIND_POLYGON: "poligony"}
         for r, kind in enumerate(S.GROUP_ORDER, start=1):
@@ -680,11 +681,11 @@ class _AdvancedNames(QGroupBox):
             self.group_edits[kind] = ed
             grid.addWidget(ed, r, 1)
         r = len(S.GROUP_ORDER) + 1
-        grid.addWidget(QLabel("bloki"), r, 0)
+        grid.addWidget(QLabel(tr("bloki")), r, 0)
         self.ed_block_group = QLineEdit(S.DEFAULT_BLOCK_GROUP)
         grid.addWidget(self.ed_block_group, r, 1)
 
-        grid.addWidget(QLabel("<b>Sufiksy</b>"), 0, 2, 1, 2)
+        grid.addWidget(QLabel(tr("<b>Sufiksy</b>")), 0, 2, 1, 2)
         for i, table in enumerate(
             [S.T_HATCHES, S.T_LINES, S.T_POLYLINES, S.T_POINTS,
              S.T_TEXTS, S.T_INSERTS], start=1
@@ -694,7 +695,7 @@ class _AdvancedNames(QGroupBox):
             self.suffix_edits[table] = ed
             grid.addWidget(ed, i, 3)
 
-        btn = QPushButton("Przywróć domyślne")
+        btn = QPushButton(tr("Przywróć domyślne"))
         btn.clicked.connect(self.reset)
         grid.addWidget(btn, r + 1, 0, 1, 4)
 
