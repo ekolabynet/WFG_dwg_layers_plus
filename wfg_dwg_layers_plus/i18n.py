@@ -14,23 +14,36 @@ modules stay testable with plain Python.
 import os
 
 
+def _qgis_locale():
+    """The language QGIS itself runs in (the interface), not the language of the system."""
+    try:
+        from qgis.core import QgsSettings
+        settings = QgsSettings()
+        override = str(settings.value("locale/overrideFlag", False)).lower() in ("true", "1")
+        user = str(settings.value("locale/userLocale", "") or "")
+        if override and user:
+            return user
+    except Exception:
+        pass
+    try:
+        from qgis.core import QgsApplication
+        loc = QgsApplication.locale() or ""
+        if loc:
+            return loc
+    except Exception:
+        pass
+    try:
+        from qgis.PyQt.QtCore import QLocale
+        return QLocale().name()          # the default locale QGIS sets for its translation
+    except Exception:
+        return os.environ.get("LANG", "")
+
+
 def _detect():
     forced = os.environ.get("WFG_LANG", "")
     if forced:
         return forced[:2].lower()
-    loc = ""
-    try:
-        from qgis.core import QgsApplication
-        loc = QgsApplication.locale() or ""
-    except Exception:
-        loc = ""
-    if not loc:
-        try:
-            from qgis.PyQt.QtCore import QLocale
-            loc = QLocale.system().name()
-        except Exception:
-            loc = os.environ.get("LANG", "")
-    return "pl" if str(loc).lower().startswith("pl") else "en"
+    return "pl" if str(_qgis_locale()).lower().startswith("pl") else "en"
 
 
 LANG = _detect()
