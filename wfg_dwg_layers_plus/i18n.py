@@ -16,6 +16,13 @@ import os
 
 def _qgis_locale():
     """The language QGIS itself runs in (the interface), not the language of the system."""
+    try:                                 # the translation QGIS actually loaded for its interface
+        from qgis.core import QgsApplication
+        loc = QgsApplication.translation() or ""
+        if loc:
+            return loc
+    except Exception:
+        pass
     try:
         from qgis.core import QgsSettings
         settings = QgsSettings()
@@ -47,6 +54,7 @@ def _detect():
 
 
 LANG = _detect()
+SOURCE = "WFG_LANG" if os.environ.get("WFG_LANG") else _qgis_locale()
 _EN = None
 
 

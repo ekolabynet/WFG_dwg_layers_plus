@@ -608,4 +608,6 @@ EN = {
         'Values fixed',
     'Zapisane wiersze':
         'Rows written',
+    'Język wtyczki: {0} (wg QGIS: {1})':
+        'Plugin language: {0} (from QGIS: {1})',
 }

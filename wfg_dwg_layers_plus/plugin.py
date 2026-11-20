@@ -9,7 +9,7 @@ import os
 
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
-from .i18n import tr
+from .i18n import LANG, SOURCE, tr
 
 MENU = "WFG DWG Layers+"
 OLD_SETTINGS_PREFIX = "dwg_layers_plus/"
@@ -220,5 +220,6 @@ class DwgLayersPlusPlugin(object):
             "  dla ciezkiej POLYLINE i cala kreska wylandowala na warstwie 0\n"
             "• podzial warstwy wg koloru, grubosci pisaka i typu encji\n\n"
             "Wtyczka opiera sie na schemacie GeoPackage produkowanym przez "
-            "wbudowany import DWG/DXF w QGIS."),
+            "wbudowany import DWG/DXF w QGIS.")
+            + "\n\n" + tr("Język wtyczki: {0} (wg QGIS: {1})").format(LANG, SOURCE),
         )
