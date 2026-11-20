@@ -84,7 +84,7 @@ class ColorSplitDialog(QDialog):
         form.addRow(tr("Warstwa CAD:"), self.cmb_layer)
 
         wymiary = QHBoxLayout()
-        self.cb_color = QCheckBox("kolor")
+        self.cb_color = QCheckBox(tr("kolor"))
         self.cb_color.setChecked(True)
         self.cb_lweight = QCheckBox(tr("grubość linii"))
         self.cb_etype = QCheckBox(tr("typ encji (łuk / okrąg / odcinek)"))

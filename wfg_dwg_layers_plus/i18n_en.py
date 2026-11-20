@@ -564,4 +564,18 @@ EN = {
         'About…',
     'WFG DWG Layers+ — import DWG/DXF do QGIS z prawdziwymi warstwami.\n\n• nazwy warstw: <warstwa_CAD>_hatch / _line / _pline / _point / _text / _insert\n• cztery grupy wg typu geometrii\n• tryb filtrow (szybki) i materializacji do osobnych tabel GPKG\n• bloki jako zlozone geometrie: jeden obiekt na wstawienie, z rekurencja, MINSERT i dziedziczeniem warstwy 0\n• odzyskiwanie atrybutow blokow (ATTRIB), ktorych libdxfrw nie czyta w ogole\n• naprawa podwojnego kodowania polskich znakow\n• odzyskanie przypisania warstw z DXF-a, gdy import zgubil je\n  dla ciezkiej POLYLINE i cala kreska wylandowala na warstwie 0\n• podzial warstwy wg koloru, grubosci pisaka i typu encji\n\nWtyczka opiera sie na schemacie GeoPackage produkowanym przez wbudowany import DWG/DXF w QGIS.':
         'WFG DWG Layers+ — DWG/DXF import into QGIS with real layers.\n\n• layer names: <CAD_layer>_hatch / _line / _pline / _point / _text / _insert\n• four groups by geometry type\n• filter mode (fast) and materialization into separate GPKG tables\n• blocks as composite geometry: one feature per insert, with recursion, MINSERT and layer 0 inheritance\n• recovery of block attributes (ATTRIB), which libdxfrw does not read at all\n• fixing double encoding of accented characters\n• recovery of layer assignment from the DXF when the import lost it\n  for heavy POLYLINE and all linework landed on layer 0\n• splitting a layer by colour, pen weight and entity type\n\nThe plugin relies on the GeoPackage schema produced by the built-in QGIS DWG/DXF import.',
+    'kolor':
+        'colour',
+    'pomijaj':
+        'ignore',
+    'teksty':
+        'texts',
+    'punkty':
+        'points',
+    'linie':
+        'lines',
+    'poligony':
+        'polygons',
+    'Anuluj':
+        'Cancel',
 }

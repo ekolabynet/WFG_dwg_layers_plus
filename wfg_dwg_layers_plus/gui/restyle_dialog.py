@@ -62,7 +62,7 @@ class RestyleDialog(QDialog):
             tr("jako grubość pisaka w mm (zalecane)"), "mm")
         self.cmb_pline_width.addItem(
             tr("jako szerokość w terenie, wiernie jak CAD"), "map")
-        self.cmb_pline_width.addItem("pomijaj", "ignore")
+        self.cmb_pline_width.addItem(tr("pomijaj"), "ignore")
         self.cmb_pline_width.setToolTip(
             tr("Polilinie CAD mają globalną szerokość (kolumna width) w jednostkach "
             "rysunku. QGIS renderuje ją wiernie — polilinia o width 0,5 wychodzi "

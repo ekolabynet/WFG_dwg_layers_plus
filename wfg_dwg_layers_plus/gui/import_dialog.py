@@ -21,6 +21,7 @@ from qgis.PyQt.QtWidgets import (
     QDoubleSpinBox,
     QFileDialog,
     QFormLayout,
+    QFrame,
     QGridLayout,
     QGroupBox,
     QHBoxLayout,
@@ -31,6 +32,7 @@ from qgis.PyQt.QtWidgets import (
     QProgressBar,
     QPushButton,
     QRadioButton,
+    QScrollArea,
     QSpinBox,
     QTableWidget,
     QTableWidgetItem,
@@ -67,10 +69,18 @@ class ImportDialog(QDialog):
         root.addWidget(self._source_box())
         root.addWidget(self._layers_box(), 1)
 
-        columns = QHBoxLayout()
+        # the options keep their natural height and scroll when the window is small
+        # (without this the appearance rows were squeezed to zero height)
+        lower = QWidget()
+        columns = QHBoxLayout(lower)
+        columns.setContentsMargins(0, 0, 0, 0)
         columns.addWidget(self._structure_box(), 1)
         columns.addWidget(self._blocks_box(), 1)
-        root.addLayout(columns)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setWidget(lower)
+        root.addWidget(scroll, 2)
 
         self.progress = QProgressBar()
         self.progress.setVisible(False)
@@ -84,6 +94,7 @@ class ImportDialog(QDialog):
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel, Qt.Orientation.Horizontal
         )
         self.buttons.button(QDialogButtonBox.StandardButton.Ok).setText(tr("Importuj"))
+        self.buttons.button(QDialogButtonBox.StandardButton.Cancel).setText(tr("Anuluj"))
         self.buttons.accepted.connect(self._on_accept)
         self.buttons.rejected.connect(self._on_reject)
         root.addWidget(self.buttons)
@@ -234,7 +245,7 @@ class ImportDialog(QDialog):
             tr("jako grubość pisaka w mm (zalecane)"), "mm")
         self.cmb_pline_width.addItem(
             tr("jako szerokość w terenie, wiernie jak CAD"), "map")
-        self.cmb_pline_width.addItem("pomijaj", "ignore")
+        self.cmb_pline_width.addItem(tr("pomijaj"), "ignore")
         self.cmb_pline_width.setToolTip(
             tr("Polilinie CAD mają globalną szerokość (kolumna width) w jednostkach "
             "rysunku. QGIS renderuje ją wiernie — polilinia o width 0,5 wychodzi "
@@ -673,8 +684,8 @@ class _AdvancedNames(QGroupBox):
         self.suffix_edits = {}
 
         grid.addWidget(QLabel(tr("<b>Grupy</b>")), 0, 0, 1, 2)
-        labels = {S.KIND_TEXT: "teksty", S.KIND_POINT: "punkty",
-                  S.KIND_LINE: "linie", S.KIND_POLYGON: "poligony"}
+        labels = {S.KIND_TEXT: tr("teksty"), S.KIND_POINT: tr("punkty"),
+                  S.KIND_LINE: tr("linie"), S.KIND_POLYGON: tr("poligony")}
         for r, kind in enumerate(S.GROUP_ORDER, start=1):
             grid.addWidget(QLabel(labels.get(kind, kind)), r, 0)
             ed = QLineEdit(S.DEFAULT_GROUPS[kind])
