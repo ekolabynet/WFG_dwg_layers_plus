@@ -4,7 +4,9 @@
 
 QGIS plugin of the WFG (WorkFieldGIS) family that fixes what hurts most in DWG/DXF import: **every CAD layer becomes
 its own QGIS layer, arranged in four groups by geometry type**, and blocks can be imported as single features instead
-of loose lines. The interface follows the QGIS language: Polish in Polish QGIS, English otherwise.
+of loose lines. You point it at a DWG or DXF and it runs the built-in QGIS import itself — fills in its window,
+confirms it and works on the result — from the plugin dialog, from *Layer → Add Layer* or from the Processing
+Toolbox. The interface follows the QGIS language: Polish in Polish QGIS, English otherwise.
 
 ### What it does
 
@@ -48,7 +50,7 @@ confirm / own GDAL import). If a field of the dialog cannot be found, the window
 3. Requirements: QGIS 3.28 or newer (QGIS 4 too). DXF needs nothing else. DWG goes through the built-in import; the
    optional own GDAL import of DWG needs ODA File Converter or LibreDWG (`dwg2dxf`), installed separately.
 
-Tested on Linux (QGIS 4). Reports from Windows and macOS are welcome in the issue tracker.
+Tested on Linux (QGIS 4.2.3). Reports from Windows and macOS are welcome in the issue tracker.
 
 ### Language
 
@@ -67,7 +69,9 @@ GPL-2.0-or-later (QGIS). Versions up to 1.5.2 were released under GPL-2.0-or-lat
 
 # WFG DWG Layers+ (po polsku)
 
-Interfejs wtyczki jest w języku QGIS: po polsku w polskim QGIS, w pozostałych po angielsku.
+Wskazujesz DWG albo DXF, a wtyczka sama uruchamia wbudowany import QGIS – wypełnia jego okno, zatwierdza je i dalej
+pracuje na wyniku: z okna wtyczki, z menu *Warstwa → Dodaj warstwę* albo z Przybornika Processing. Interfejs wtyczki
+jest w języku QGIS: po polsku w polskim QGIS, w pozostałych po angielsku.
 
 **Gdzie jest wtyczka:** menu *Wektor → WFG DWG Layers+*, *Warstwa → Dodaj warstwę → Dodaj warstwę DWG/DXF+…*
 (także na pasku Zarządzanie warstwami) oraz **Przybornik Processing** → *WFG DWG Layers+*: Importuj DWG/DXF jako
