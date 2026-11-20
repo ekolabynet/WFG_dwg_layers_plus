@@ -95,7 +95,7 @@ class ImportAlgorithm(_Base):
         return tr("Importuj DWG/DXF jako warstwy")
 
     def shortHelpString(self):
-        return tr("Każda warstwa CAD staje się osobną warstwą QGIS „<warstwa_CAD>_<typ>” w czterech grupach wg typu "
+        return tr("Każda warstwa CAD staje się osobną warstwą QGIS „&lt;warstwa_CAD&gt;_&lt;typ&gt;” w czterech grupach wg typu "
                   "geometrii. Źródło: DXF albo DWG (własny import przez GDAL; DWG wymaga ODA File Converter albo "
                   "LibreDWG) albo GeoPackage z wbudowanego importu QGIS. Bloki złożone i punkty wstawień tylko dla "
                   "GeoPackage z wbudowanego importu bez rozwijania bloków.")
@@ -113,8 +113,10 @@ class ImportAlgorithm(_Base):
             [tr("Filtry na wspólnej tabeli (szybko)"), tr("Osobne tabele w GeoPackage")], defaultValue=0))
         self.addParameter(QgsProcessingParameterEnum(
             self.BLOCK_MODE, tr("Bloki"),
-            [tr("Rozbite na geometrie (jak dotąd)"), tr("Punkty wstawień z atrybutami"),
-             tr("Złożone geometrie — jeden obiekt na wstawienie")], defaultValue=0))
+            [tr("Rozbite na geometrie (jak dotąd)"),
+             tr("Punkty wstawień z atrybutami (tylko GeoPackage z wbudowanego importu)"),
+             tr("Złożone geometrie — jeden obiekt na wstawienie (tylko GeoPackage z wbudowanego importu)")],
+            defaultValue=0))
         self.addParameter(QgsProcessingParameterBoolean(self.SKIP_EMPTY, tr("Pomijaj puste warstwy"), True))
         self.addParameter(QgsProcessingParameterBoolean(
             self.NUMBERED, tr("Numeruj grupy (stała kolejność w legendzie)"), True))
@@ -132,8 +134,9 @@ class ImportAlgorithm(_Base):
             self.parameterAsEnum(parameters, self.BLOCK_MODE, context)]
         if ext != ".gpkg" and block_mode != S.BlockMode.EXPLODED:
             raise QgsProcessingException(tr(
-                "Punkty wstawień i bloki złożone wymagają GeoPackage z wbudowanego importu QGIS bez rozwijania "
-                "bloków (Projekt > Importuj/Eksportuj > Importuj warstwy z DWG/DXF). Własny import DXF rozwija bloki."))
+                "W przyborniku DWG i DXF idą przez własny import GDAL, który rozbija bloki na geometrie. Wybierz "
+                "„Rozbite na geometrie” albo najpierw zaimportuj rysunek oknem wtyczki (Wektor > WFG DWG Layers+, "
+                "bloki złożone) i podaj tu powstały GeoPackage."))
 
         config = runner.RunConfig()
         config.source_path = source

@@ -582,8 +582,6 @@ EN = {
         'Add DWG/DXF+ Layer…',
     'Importuj DWG/DXF jako warstwy':
         'Import DWG/DXF as layers',
-    'Każda warstwa CAD staje się osobną warstwą QGIS „<warstwa_CAD>_<typ>” w czterech grupach wg typu geometrii. Źródło: DXF albo DWG (własny import przez GDAL; DWG wymaga ODA File Converter albo LibreDWG) albo GeoPackage z wbudowanego importu QGIS. Bloki złożone i punkty wstawień tylko dla GeoPackage z wbudowanego importu bez rozwijania bloków.':
-        'Every CAD layer becomes a separate QGIS layer "<cad_layer>_<type>" in four groups by geometry type. Source: DXF or DWG (own import via GDAL; DWG requires ODA File Converter or LibreDWG) or a GeoPackage from the built-in QGIS import. Composite blocks and insert points only for a GeoPackage from the built-in import without expanding blocks.',
     'Odzyskaj warstwy z rysunku':
         'Recover layers from the drawing',
     'Napraw kodowanie':
@@ -598,8 +596,6 @@ EN = {
         'GeoPackage',
     'Liczba warstw':
         'Number of layers',
-    'Punkty wstawień i bloki złożone wymagają GeoPackage z wbudowanego importu QGIS bez rozwijania bloków (Projekt > Importuj/Eksportuj > Importuj warstwy z DWG/DXF). Własny import DXF rozwija bloki.':
-        'Insert points and composite blocks require a GeoPackage from the built-in QGIS import without expanding blocks (Project > Import/Export > Import Layers from DWG/DXF). The own DXF import expands blocks.',
     'Poprawione obiekty':
         'Features fixed',
     'Kopia zapasowa':
@@ -610,4 +606,12 @@ EN = {
         'Rows written',
     'Język wtyczki: {0} (wg QGIS: {1})':
         'Plugin language: {0} (from QGIS: {1})',
+    'Każda warstwa CAD staje się osobną warstwą QGIS „&lt;warstwa_CAD&gt;_&lt;typ&gt;” w czterech grupach wg typu geometrii. Źródło: DXF albo DWG (własny import przez GDAL; DWG wymaga ODA File Converter albo LibreDWG) albo GeoPackage z wbudowanego importu QGIS. Bloki złożone i punkty wstawień tylko dla GeoPackage z wbudowanego importu bez rozwijania bloków.':
+        'Every CAD layer becomes a separate QGIS layer "&lt;cad_layer&gt;_&lt;type&gt;" in four groups by geometry type. Source: DXF or DWG (own import via GDAL; DWG requires ODA File Converter or LibreDWG) or a GeoPackage from the built-in QGIS import. Composite blocks and insert points only for a GeoPackage from the built-in import without expanding blocks.',
+    'Punkty wstawień z atrybutami (tylko GeoPackage z wbudowanego importu)':
+        'Insert points with attributes (GeoPackage from the built-in import only)',
+    'Złożone geometrie — jeden obiekt na wstawienie (tylko GeoPackage z wbudowanego importu)':
+        'Composite geometry — one feature per insert (GeoPackage from the built-in import only)',
+    'W przyborniku DWG i DXF idą przez własny import GDAL, który rozbija bloki na geometrie. Wybierz „Rozbite na geometrie” albo najpierw zaimportuj rysunek oknem wtyczki (Wektor > WFG DWG Layers+, bloki złożone) i podaj tu powstały GeoPackage.':
+        "In the Toolbox, DWG and DXF go through the plugin's own GDAL import, which explodes blocks into geometry. Choose “Exploded into geometry”, or first import the drawing with the plugin dialog (Vector > WFG DWG Layers+, composite blocks) and give the resulting GeoPackage here.",
 }
