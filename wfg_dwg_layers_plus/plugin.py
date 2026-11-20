@@ -125,8 +125,8 @@ class DwgLayersPlusPlugin(object):
         self.iface.addPluginToVectorMenu(MENU, split)
         self.actions.append(split)
 
-        # Layer > Add Layer > Add DWG/DXF+ Layer… (and the Manage Layers toolbar), next to the other sources
-        self.add_layer_action = QAction(icon, tr("Dodaj warstwę DWG/DXF+…"), self.iface.mainWindow())
+        # Layer > Add Layer > Add DWG/DXF+ Layers… (and the Manage Layers toolbar), next to the other sources
+        self.add_layer_action = QAction(icon, tr("Dodaj warstwy DWG/DXF+…"), self.iface.mainWindow())
         self.add_layer_action.setObjectName("wfgDwgLayersPlusAddLayer")
         self.add_layer_action.setStatusTip(
             tr("Import DWG/DXF z warstwami nazwanymi jak w CAD, w czterech grupach"))

@@ -578,8 +578,8 @@ EN = {
         'polygons',
     'Anuluj':
         'Cancel',
-    'Dodaj warstwę DWG/DXF+…':
-        'Add DWG/DXF+ Layer…',
+    'Dodaj warstwy DWG/DXF+…':
+        'Add DWG/DXF+ Layers…',
     'Importuj DWG/DXF jako warstwy':
         'Import DWG/DXF as layers',
     'Odzyskaj warstwy z rysunku':

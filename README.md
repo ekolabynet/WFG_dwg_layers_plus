@@ -33,7 +33,7 @@ Menu *Vector → WFG DWG Layers+*:
 | Recover layers from the drawing… | heavy POLYLINE that landed on layer 0: the layer is rewritten from the DXF by handle, geometry untouched |
 | Split layer by colour… | drawings that really keep everything on layer 0 and separate content by colour, pen weight or entity type |
 
-Also in *Layer → Add Layer → Add DWG/DXF+ Layer…* (and on the Manage Layers toolbar), next to the other data sources.
+Also in *Layer → Add Layer → Add DWG/DXF+ Layers…* (and on the Manage Layers toolbar), next to the other data sources.
 
 **Processing Toolbox** (provider *WFG DWG Layers+*, for models and batch runs): *Import DWG/DXF as layers*,
 *Recover layers from the drawing*, *Fix encoding*, *Load block attributes from the drawing*. The built-in DWG/DXF
@@ -73,7 +73,7 @@ Wskazujesz DWG albo DXF, a wtyczka sama uruchamia wbudowany import QGIS – wype
 pracuje na wyniku: z okna wtyczki, z menu *Warstwa → Dodaj warstwę* albo z Przybornika Processing. Interfejs wtyczki
 jest w języku QGIS: po polsku w polskim QGIS, w pozostałych po angielsku.
 
-**Gdzie jest wtyczka:** menu *Wektor → WFG DWG Layers+*, *Warstwa → Dodaj warstwę → Dodaj warstwę DWG/DXF+…*
+**Gdzie jest wtyczka:** menu *Wektor → WFG DWG Layers+*, *Warstwa → Dodaj warstwę → Dodaj warstwy DWG/DXF+…*
 (także na pasku Zarządzanie warstwami) oraz **Przybornik Processing** → *WFG DWG Layers+*: Importuj DWG/DXF jako
 warstwy, Odzyskaj warstwy z rysunku, Napraw kodowanie, Wczytaj atrybuty bloków z rysunku — do modeli i przetwarzania
 wsadowego. Wbudowany import DWG/DXF nie ma API w Pythonie, więc wtyczka steruje jego oknem: domyślnie sama wpisuje rysunek,
