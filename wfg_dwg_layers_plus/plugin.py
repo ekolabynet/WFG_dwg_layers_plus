@@ -12,10 +12,10 @@ SETTINGS_PREFIX = "wfg_dwg_layers_plus/"
 
 
 def migrate_settings():
-    """Przenosi ustawienia z pakietu dwg_layers_plus (do 1.5.2) do wfg_dwg_layers_plus.
+    """Copy settings of the old package dwg_layers_plus (up to 1.5.2) to wfg_dwg_layers_plus.
 
-    Kopiuje tylko klucze, których w nowym miejscu jeszcze nie ma; stare zostają,
-    dopóki stara wtyczka może być zainstalowana obok."""
+    Only keys missing under the new prefix are copied; the old keys stay while
+    the old plugin may still be installed next to the new one."""
     from qgis.core import QgsSettings
     settings = QgsSettings()
     copied = 0
@@ -37,7 +37,7 @@ class DwgLayersPlusPlugin(object):
     def initGui(self):  # noqa: N802
         try:
             migrate_settings()
-        except Exception:  # ustawienia nie mogą zatrzymać startu wtyczki
+        except Exception:  # settings must never stop the plugin from loading
             pass
         icon_path = os.path.join(os.path.dirname(__file__), "icon.png")
         icon = QIcon(icon_path) if os.path.exists(icon_path) else QIcon()

@@ -1,6 +1,7 @@
 [general]
 name=WFG DWG Layers+
 qgisMinimumVersion=3.28
+qgisMaximumVersion=4.99
 description=Import DWG/DXF z prawdziwymi warstwami: nazwa warstwy CAD + sufiks typu geometrii, cztery grupy geometryczne, bloki jako zlozone geometrie.
 description[en]=DWG/DXF import with real per-CAD-layer layers named "<cadlayer>_<suffix>", grouped into four geometry groups, plus blocks as composite geometries.
 about=Wtyczka z rodziny WFG (WorkFieldGIS). Nadbudowuje wbudowany import DWG/DXF w QGIS. Wbudowany import tworzy jedna zbiorcza tabele na typ geometrii i pokazuje warstwy CAD jako filtry o nazwach "lines"/"hatches"/... . DWG Layers+ czyta ten sam GeoPackage i buduje drzewo warstw, w ktorym kazda warstwa CAD jest osobna warstwa QGIS o nazwie "<warstwa_CAD>_hatch" itd., poukladana w cztery grupy wg typu geometrii. Opcjonalnie materializuje warstwy do osobnych tabel GPKG oraz sklada bloki (INSERT) w pojedyncze obiekty o geometrii wieloczesciowej, z rekurencja po blokach zagniezdzonych, rozwinieciem MINSERT i dziedziczeniem warstwy 0.
