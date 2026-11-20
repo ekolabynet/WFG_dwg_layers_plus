@@ -17,8 +17,11 @@ do projektu — i te tymczasowe warstwy usuwamy, bo wlasne drzewo zbudujemy sami
 
 import os
 
-from qgis.core import QgsProject, QgsSettings
-from qgis.PyQt.QtWidgets import QAction
+from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMessageLog, QgsProject, QgsSettings
+from qgis.PyQt.QtCore import QTimer
+from qgis.PyQt.QtWidgets import (
+    QAbstractButton, QAction, QApplication, QDialog, QDialogButtonBox, QLineEdit, QMessageBox, QTableWidget,
+)
 
 from . import gpkg_schema as S
 from ..i18n import tr
@@ -89,9 +92,99 @@ def preset_block_mode(block_mode, use_curves=None):
                 pass
 
 
-def run_builtin_import(iface, block_mode, use_curves=True, cleanup=True):
+def free_gpkg_path(path):
+    """`path` if no such file exists, else `<stem>_2.gpkg`, `_3`… — the automatic mode never
+    answers an "overwrite?" question on the user's behalf."""
+    if not os.path.exists(path):
+        return path
+    stem, ext = os.path.splitext(path)
+    n = 2
+    while os.path.exists("%s_%d%s" % (stem, n, ext)):
+        n += 1
+    return "%s_%d%s" % (stem, n, ext)
+
+
+class _AutoDriver(object):
+    """Fills the built-in DWG/DXF import dialog and presses Import and OK.
+
+    The dialog has no API, so its widgets are found by object names and texts. Whatever
+    cannot be found, the driver stops and leaves the dialog to the user — the worst case is
+    the manual mode, never a wrong import."""
+
+    def __init__(self, drawing, gpkg, crs_authid=None):
+        self.drawing, self.gpkg, self.crs_authid = drawing, gpkg, crs_authid
+        self.tries = 0
+        self.done = False
+        self.note = None
+
+    def start(self):
+        QTimer.singleShot(150, self._poll)
+
+    def _log(self, msg, level=Qgis.Info):
+        QgsMessageLog.logMessage(msg, "WFG DWG Layers+", level)
+
+    def _poll(self):
+        dlg = QApplication.activeModalWidget()
+        if not isinstance(dlg, QDialog) or isinstance(dlg, QMessageBox):
+            self.tries += 1
+            if self.tries < 50:            # up to ~7 s for the dialog to show
+                QTimer.singleShot(150, self._poll)
+            return
+        try:
+            self._drive(dlg)
+        except Exception as exc:  # noqa: BLE001  any surprise -> the user finishes by hand
+            self.note = str(exc)
+            self._log("auto import stopped: %s" % exc, Qgis.Warning)
+
+    @staticmethod
+    def _find_edit(dlg, *keys):
+        for ed in dlg.findChildren(QLineEdit):
+            name = ed.objectName().lower()
+            if any(k in name for k in keys):
+                return ed
+        return None
+
+    def _drive(self, dlg):
+        ed_db = self._find_edit(dlg, "database", "package", "gpkg")
+        ed_dwg = self._find_edit(dlg, "drawing", "dwg")
+        if ed_db is None or ed_dwg is None:
+            raise RuntimeError("fields not found: %s" % [e.objectName() for e in dlg.findChildren(QLineEdit)])
+        ed_db.setText(self.gpkg)
+        ed_db.editingFinished.emit()
+        ed_dwg.setText(self.drawing)
+        ed_dwg.editingFinished.emit()
+        if self.crs_authid:
+            try:
+                from qgis.gui import QgsProjectionSelectionWidget
+                for w in dlg.findChildren(QgsProjectionSelectionWidget):
+                    w.setCrs(QgsCoordinateReferenceSystem(self.crs_authid))
+            except Exception:  # noqa: BLE001
+                pass
+        btn = None
+        for b in dlg.findChildren(QAbstractButton):
+            if "importdrawing" in b.objectName().lower():
+                btn = b
+                break
+        if btn is None or not btn.isEnabled():
+            raise RuntimeError("import button not found or disabled")
+        btn.click()                         # synchronous: the drawing is read into the GeoPackage
+        tables = [t for t in dlg.findChildren(QTableWidget) if t.rowCount()]
+        if not tables:
+            raise RuntimeError("no layer list after import")
+        box = dlg.findChild(QDialogButtonBox)
+        ok = box.button(QDialogButtonBox.StandardButton.Ok) if box is not None else None
+        if ok is None or not ok.isEnabled():
+            raise RuntimeError("OK button not available")
+        self.done = True
+        ok.click()
+
+
+def run_builtin_import(iface, block_mode, use_curves=True, cleanup=True, auto=False,
+                       drawing=None, gpkg=None, crs_authid=None):
     """Otwiera wbudowany dialog i zwraca sciezke do powstalego GeoPackage.
 
+    :param auto: wypelnij okno (rysunek, GeoPackage, uklad) i nacisnij Import oraz OK
+        bez udzialu uzytkownika; gdy sie nie uda, okno zostaje dla uzytkownika.
     :raises BuiltinImportError: gdy akcji nie ma albo nic nie zaimportowano
     """
     main_window = iface.mainWindow() if iface is not None else None
@@ -110,7 +203,16 @@ def run_builtin_import(iface, block_mode, use_curves=True, cleanup=True):
     root = project.layerTreeRoot()
     before_nodes = list(root.children())
 
+    driver = None
+    if auto and drawing:
+        target = free_gpkg_path(gpkg or os.path.splitext(drawing)[0] + ".gpkg")
+        driver = _AutoDriver(drawing, target, crs_authid)
+        driver.start()
     action.trigger()   # modalny — wraca po zamknieciu okna
+    if driver is not None and not driver.done:
+        QgsMessageLog.logMessage(
+            "auto import fell back to the dialog: %s" % (driver.note or "dialog not found"),
+            "WFG DWG Layers+", Qgis.Warning)
 
     after = project.mapLayers()
     new_ids = [lid for lid in after if lid not in before_layers]

@@ -84,8 +84,8 @@ class _Base(QgsProcessingAlgorithm):
 
 
 class ImportAlgorithm(_Base):
-    INPUT, OUTPUT_GPKG, CRS, LAYER_MODE, BLOCK_MODE, SKIP_EMPTY, NUMBERED = (
-        "INPUT", "OUTPUT_GPKG", "CRS", "LAYER_MODE", "BLOCK_MODE", "SKIP_EMPTY", "NUMBERED")
+    INPUT, OUTPUT_GPKG, CRS, IMPORTER, LAYER_MODE, BLOCK_MODE, SKIP_EMPTY, NUMBERED = (
+        "INPUT", "OUTPUT_GPKG", "CRS", "IMPORTER", "LAYER_MODE", "BLOCK_MODE", "SKIP_EMPTY", "NUMBERED")
     OUTPUT, LAYERS = "OUTPUT", "LAYERS"
 
     def name(self):
@@ -96,9 +96,11 @@ class ImportAlgorithm(_Base):
 
     def shortHelpString(self):
         return tr("Każda warstwa CAD staje się osobną warstwą QGIS „&lt;warstwa_CAD&gt;_&lt;typ&gt;” w czterech grupach wg typu "
-                  "geometrii. Źródło: DXF albo DWG (własny import przez GDAL; DWG wymaga ODA File Converter albo "
-                  "LibreDWG) albo GeoPackage z wbudowanego importu QGIS. Bloki złożone i punkty wstawień tylko dla "
-                  "GeoPackage z wbudowanego importu bez rozwijania bloków.")
+                  "geometrii. Źródło: DXF, DWG albo GeoPackage z wbudowanego importu QGIS.") + "<br><br>" + tr(
+                  "Import rysunku: wbudowany import QGIS uruchamiany automatycznie (okno wypełnia się i zamyka samo), "
+                  "wbudowany import z jego oknem do zatwierdzenia albo własny import przez GDAL (DWG wymaga ODA File "
+                  "Converter albo LibreDWG). Wbudowany import wymaga otwartego QGIS — w qgis_process wtyczka "
+                  "przechodzi na GDAL. Bloki złożone i punkty wstawień — tylko z wbudowanym importem.")
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFile(
@@ -109,13 +111,18 @@ class ImportAlgorithm(_Base):
             "GeoPackage (*.gpkg)", optional=True, createByDefault=False))
         self.addParameter(QgsProcessingParameterCrs(self.CRS, tr("Układ współrzędnych:"), optional=True))
         self.addParameter(QgsProcessingParameterEnum(
+            self.IMPORTER, tr("Import rysunku (DWG/DXF)"),
+            [tr("Wbudowany import QGIS — automatycznie"),
+             tr("Wbudowany import QGIS — z jego oknem do zatwierdzenia"),
+             tr("Własny import przez GDAL")], defaultValue=0))
+        self.addParameter(QgsProcessingParameterEnum(
             self.LAYER_MODE, tr("Struktura"),
             [tr("Filtry na wspólnej tabeli (szybko)"), tr("Osobne tabele w GeoPackage")], defaultValue=0))
         self.addParameter(QgsProcessingParameterEnum(
             self.BLOCK_MODE, tr("Bloki"),
             [tr("Rozbite na geometrie (jak dotąd)"),
-             tr("Punkty wstawień z atrybutami (tylko GeoPackage z wbudowanego importu)"),
-             tr("Złożone geometrie — jeden obiekt na wstawienie (tylko GeoPackage z wbudowanego importu)")],
+             tr("Punkty wstawień z atrybutami (tylko wbudowany import)"),
+             tr("Złożone geometrie — jeden obiekt na wstawienie (tylko wbudowany import)")],
             defaultValue=0))
         self.addParameter(QgsProcessingParameterBoolean(self.SKIP_EMPTY, tr("Pomijaj puste warstwy"), True))
         self.addParameter(QgsProcessingParameterBoolean(
@@ -132,15 +139,26 @@ class ImportAlgorithm(_Base):
         ext = os.path.splitext(source)[1].lower()
         block_mode = (S.BlockMode.EXPLODED, S.BlockMode.INSERT_POINTS, S.BlockMode.COMPOSITE)[
             self.parameterAsEnum(parameters, self.BLOCK_MODE, context)]
-        if ext != ".gpkg" and block_mode != S.BlockMode.EXPLODED:
+        importer = self.parameterAsEnum(parameters, self.IMPORTER, context)
+        iface = None
+        if ext != ".gpkg" and importer in (0, 1):
+            try:
+                from qgis.utils import iface
+            except ImportError:
+                iface = None
+            if iface is None:
+                feedback.pushWarning(tr("Wbudowany import QGIS wymaga otwartego okna QGIS — używam własnego "
+                                        "importu przez GDAL."))
+                importer = 2
+        if ext != ".gpkg" and importer == 2 and block_mode != S.BlockMode.EXPLODED:
             raise QgsProcessingException(tr(
-                "W przyborniku DWG i DXF idą przez własny import GDAL, który rozbija bloki na geometrie. Wybierz "
-                "„Rozbite na geometrie” albo najpierw zaimportuj rysunek oknem wtyczki (Wektor > WFG DWG Layers+, "
-                "bloki złożone) i podaj tu powstały GeoPackage."))
+                "Własny import przez GDAL rozbija bloki na geometrie. Wybierz „Rozbite na geometrie” albo wbudowany "
+                "import QGIS."))
 
         config = runner.RunConfig()
         config.source_path = source
-        config.use_own_importer = ext in (".dxf", ".dwg")
+        config.use_own_importer = ext != ".gpkg" and importer == 2
+        config.builtin_auto = importer == 0
         out = self.parameterAsFileOutput(parameters, self.OUTPUT_GPKG, context)
         config.gpkg_path = out or None
         crs = self.parameterAsCrs(parameters, self.CRS, context)
@@ -152,7 +170,7 @@ class ImportAlgorithm(_Base):
         config.tree.numbered_groups = self.parameterAsBool(parameters, self.NUMBERED, context)
 
         try:
-            result = runner.run(config, None, feedback, _progress(feedback))
+            result = runner.run(config, iface, feedback, _progress(feedback))
         except Exception as exc:  # noqa: BLE001
             raise QgsProcessingException(tr("Blad importu: {0}").format(exc))
         for msg in result.messages:

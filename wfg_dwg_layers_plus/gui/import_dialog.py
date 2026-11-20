@@ -139,6 +139,11 @@ class ImportDialog(QDialog):
         self.cb_own_importer.toggled.connect(self._update_enabled)
         form.addRow("", self.cb_own_importer)
 
+        self.cb_builtin_window = QCheckBox(
+            tr("Pokaż okno wbudowanego importu QGIS (zatwierdzam sam; bez tego wypełnia się i zamyka automatycznie)")
+        )
+        form.addRow("", self.cb_builtin_window)
+
         self.lbl_converter = QLabel("")
         self.lbl_converter.setWordWrap(True)
         form.addRow("", self.lbl_converter)
@@ -384,6 +389,7 @@ class ImportDialog(QDialog):
         self.cb_rebuild_names.setEnabled(self.rb_materialize.isChecked())
 
         own = self.cb_own_importer.isChecked()
+        self.cb_builtin_window.setEnabled(not own)
         if own:
             if producer_ogr.dwg_converter_available():
                 which = producer_ogr.find_oda_converter() or producer_ogr.find_libredwg()
@@ -493,6 +499,7 @@ class ImportDialog(QDialog):
         cfg.gpkg_path = self.ed_gpkg.text().strip() or None
         cfg.use_curves = self.cb_curves.isChecked()
         cfg.use_own_importer = self.cb_own_importer.isChecked()
+        cfg.builtin_auto = not self.cb_builtin_window.isChecked()
         cfg.segmentize_on_materialize = self.cb_segmentize.isChecked()
         cfg.reuse_table_names = not self.cb_rebuild_names.isChecked()
         crs = self.crs_widget.crs()
@@ -616,6 +623,7 @@ class ImportDialog(QDialog):
         s.setValue(SETTINGS_PREFIX + "blockMode", self._block_mode_index())
         s.setValue(SETTINGS_PREFIX + "ownImporter",
                    self.cb_own_importer.isChecked())
+        s.setValue(SETTINGS_PREFIX + "builtinWindow", self.cb_builtin_window.isChecked())
         s.setValue(SETTINGS_PREFIX + "lineWidth", self.sp_line_width.value())
         s.setValue(SETTINGS_PREFIX + "pointSize", self.sp_point_size.value())
         s.setValue(SETTINGS_PREFIX + "insertSize", self.sp_insert_size.value())
@@ -648,6 +656,7 @@ class ImportDialog(QDialog):
         self.cb_import_invisible.setChecked(flag("importInvisible", True))
         self.cb_color_by_layer.setChecked(flag("colorByLayer", False))
         self.cb_own_importer.setChecked(flag("ownImporter", False))
+        self.cb_builtin_window.setChecked(flag("builtinWindow", False))
         self.cb_show_points.setChecked(flag("showPoints", False))
 
         def number(key, default):

@@ -35,8 +35,11 @@ Also in *Layer → Add Layer → Add DWG/DXF+ Layer…* (and on the Manage Layer
 
 **Processing Toolbox** (provider *WFG DWG Layers+*, for models and batch runs): *Import DWG/DXF as layers*,
 *Recover layers from the drawing*, *Fix encoding*, *Load block attributes from the drawing*. The built-in DWG/DXF
-import has no Python API, so in Processing a DXF/DWG goes through the plugin's own GDAL import (blocks exploded);
-for composite blocks import with the built-in dialog first and give the resulting GeoPackage to the algorithm.
+import has no Python API, so the plugin drives its dialog: by default it fills in the drawing, the GeoPackage and
+the CRS, presses *Import* and *OK* by itself (Processing parameter *Drawing import*: automatic / with its window to
+confirm / own GDAL import). If a field of the dialog cannot be found, the window stays open for you to finish. In
+`qgis_process` (no QGIS window) the algorithm falls back to the GDAL import. In the plugin dialog the checkbox
+*Show the built-in QGIS import window* lets you confirm the native window yourself.
 
 ### Installation
 
@@ -69,8 +72,12 @@ Interfejs wtyczki jest w języku QGIS: po polsku w polskim QGIS, w pozostałych 
 **Gdzie jest wtyczka:** menu *Wektor → WFG DWG Layers+*, *Warstwa → Dodaj warstwę → Dodaj warstwę DWG/DXF+…*
 (także na pasku Zarządzanie warstwami) oraz **Przybornik Processing** → *WFG DWG Layers+*: Importuj DWG/DXF jako
 warstwy, Odzyskaj warstwy z rysunku, Napraw kodowanie, Wczytaj atrybuty bloków z rysunku — do modeli i przetwarzania
-wsadowego. Wbudowany import DWG/DXF nie ma API w Pythonie, więc w Processing DXF/DWG idzie przez własny import GDAL
-(bloki rozwinięte); do bloków złożonych najpierw zaimportuj rysunek oknem wbudowanym i podaj algorytmowi powstały GeoPackage.
+wsadowego. Wbudowany import DWG/DXF nie ma API w Pythonie, więc wtyczka steruje jego oknem: domyślnie sama wpisuje rysunek,
+GeoPackage i układ, naciska *Importuj* i *OK* (parametr Processing *Import rysunku*: automatycznie / z jego oknem do
+zatwierdzenia / własny import GDAL). Gdy nie znajdzie któregoś pola, okno zostaje otwarte do dokończenia ręcznie.
+W `qgis_process` (bez okna QGIS) algorytm przechodzi na import GDAL. W oknie wtyczki checkbox *Pokaż okno wbudowanego
+importu QGIS* pozwala zatwierdzać natywne okno samodzielnie. Wynikowy GeoPackage nigdy nie nadpisuje istniejącego
+(przy kolizji dostaje sufiks `_2`, `_3`…).
 
 Wtyczka QGIS z rodziny WFG (WorkFieldGIS), która naprawia to, co w imporcie DWG/DXF najbardziej uwiera: **warstwy nazywają się jak w CAD-zie i leżą w czterech grupach wg typu geometrii**, a bloki można zaimportować jako pojedyncze obiekty zamiast luźnych linii.
 

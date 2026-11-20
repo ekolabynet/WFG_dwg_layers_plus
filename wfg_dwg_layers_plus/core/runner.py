@@ -34,6 +34,8 @@ class RunConfig(object):
         #: False = wymus nowe nazwy tabel zamiast nadpisac poprzednie
         self.reuse_table_names = True
         self.use_own_importer = False    # producent C/D zamiast wbudowanego
+        #: True = wbudowany import wypelniany i zatwierdzany automatycznie, False = jego okno dla uzytkownika
+        self.builtin_auto = True
 
 
 class RunResult(object):
@@ -98,7 +100,8 @@ def prepare_gpkg(config, iface=None, feedback=None, progress_cb=None):
 
     # producent B: wbudowany dialog QGIS
     return producer_builtin.run_builtin_import(
-        iface, config.tree.block_mode, config.use_curves
+        iface, config.tree.block_mode, config.use_curves,
+        auto=config.builtin_auto, drawing=source, gpkg=config.gpkg_path, crs_authid=config.crs_authid,
     )
 
 

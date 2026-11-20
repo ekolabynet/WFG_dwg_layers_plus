@@ -606,12 +606,26 @@ EN = {
         'Rows written',
     'Język wtyczki: {0} (wg QGIS: {1})':
         'Plugin language: {0} (from QGIS: {1})',
-    'Każda warstwa CAD staje się osobną warstwą QGIS „&lt;warstwa_CAD&gt;_&lt;typ&gt;” w czterech grupach wg typu geometrii. Źródło: DXF albo DWG (własny import przez GDAL; DWG wymaga ODA File Converter albo LibreDWG) albo GeoPackage z wbudowanego importu QGIS. Bloki złożone i punkty wstawień tylko dla GeoPackage z wbudowanego importu bez rozwijania bloków.':
-        'Every CAD layer becomes a separate QGIS layer "&lt;cad_layer&gt;_&lt;type&gt;" in four groups by geometry type. Source: DXF or DWG (own import via GDAL; DWG requires ODA File Converter or LibreDWG) or a GeoPackage from the built-in QGIS import. Composite blocks and insert points only for a GeoPackage from the built-in import without expanding blocks.',
-    'Punkty wstawień z atrybutami (tylko GeoPackage z wbudowanego importu)':
-        'Insert points with attributes (GeoPackage from the built-in import only)',
-    'Złożone geometrie — jeden obiekt na wstawienie (tylko GeoPackage z wbudowanego importu)':
-        'Composite geometry — one feature per insert (GeoPackage from the built-in import only)',
-    'W przyborniku DWG i DXF idą przez własny import GDAL, który rozbija bloki na geometrie. Wybierz „Rozbite na geometrie” albo najpierw zaimportuj rysunek oknem wtyczki (Wektor > WFG DWG Layers+, bloki złożone) i podaj tu powstały GeoPackage.':
-        "In the Toolbox, DWG and DXF go through the plugin's own GDAL import, which explodes blocks into geometry. Choose “Exploded into geometry”, or first import the drawing with the plugin dialog (Vector > WFG DWG Layers+, composite blocks) and give the resulting GeoPackage here.",
+    'Każda warstwa CAD staje się osobną warstwą QGIS „&lt;warstwa_CAD&gt;_&lt;typ&gt;” w czterech grupach wg typu geometrii. Źródło: DXF, DWG albo GeoPackage z wbudowanego importu QGIS.':
+        'Every CAD layer becomes a separate QGIS layer "&lt;cad_layer&gt;_&lt;type&gt;" in four groups by geometry type. Source: DXF, DWG or a GeoPackage from the built-in QGIS import.',
+    'Import rysunku: wbudowany import QGIS uruchamiany automatycznie (okno wypełnia się i zamyka samo), wbudowany import z jego oknem do zatwierdzenia albo własny import przez GDAL (DWG wymaga ODA File Converter albo LibreDWG). Wbudowany import wymaga otwartego QGIS — w qgis_process wtyczka przechodzi na GDAL. Bloki złożone i punkty wstawień — tylko z wbudowanym importem.':
+        "Drawing import: the built-in QGIS import run automatically (its window fills in and closes by itself), the built-in import with its window for you to confirm, or the plugin's own import via GDAL (DWG requires ODA File Converter or LibreDWG). The built-in import needs a running QGIS — in qgis_process the plugin falls back to GDAL. Composite blocks and insert points — with the built-in import only.",
+    'Import rysunku (DWG/DXF)':
+        'Drawing import (DWG/DXF)',
+    'Wbudowany import QGIS — automatycznie':
+        'Built-in QGIS import — automatic',
+    'Wbudowany import QGIS — z jego oknem do zatwierdzenia':
+        'Built-in QGIS import — with its window to confirm',
+    'Własny import przez GDAL':
+        'Own import via GDAL',
+    'Punkty wstawień z atrybutami (tylko wbudowany import)':
+        'Insert points with attributes (built-in import only)',
+    'Złożone geometrie — jeden obiekt na wstawienie (tylko wbudowany import)':
+        'Composite geometry — one feature per insert (built-in import only)',
+    'Wbudowany import QGIS wymaga otwartego okna QGIS — używam własnego importu przez GDAL.':
+        'The built-in QGIS import needs a running QGIS window — using the own import via GDAL.',
+    'Własny import przez GDAL rozbija bloki na geometrie. Wybierz „Rozbite na geometrie” albo wbudowany import QGIS.':
+        'The own import via GDAL explodes blocks into geometry. Choose “Exploded into geometry” or the built-in QGIS import.',
+    'Pokaż okno wbudowanego importu QGIS (zatwierdzam sam; bez tego wypełnia się i zamyka automatycznie)':
+        'Show the built-in QGIS import window (I confirm it myself; otherwise it fills in and closes automatically)',
 }
