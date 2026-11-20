@@ -301,4 +301,13 @@ Dlatego kontraktem wtyczki jest **schemat GeoPackage**, który ten importer prod
 
 ## Licencja
 
-GPL-2.0-or-later, zgodnie z QGIS.
+**Mozilla Public License 2.0** (`wfg_dwg_layers_plus/LICENSE`, nagłówki `SPDX-License-Identifier: MPL-2.0`)
+— od wersji 1.6.0. © 2026 Piotr Mędrzycki. Wersje do 1.5.2 wydane na GPL-2.0-or-later i te kopie zostają na GPL.
+
+- MPL-2.0 bez oznaczenia „Incompatible With Secondary Licenses” jest zgodna z GPL-2.0-or-later, więc wtyczka
+  może działać w QGIS i trafić do repozytorium wtyczek QGIS.
+- Copyleft na poziomie pliku: zmiany w plikach tej wtyczki udostępnia się na MPL-2.0, ale kod można łączyć
+  z własnym, także zamkniętym, np. moduły rdzenia bez importu QGIS (`core/affine.py`, `core/naming.py`,
+  `core/gpkg_schema.py`, `core/gpkg_reader.py`, `core/layer_fix.py`).
+- Licencja na innych warunkach (np. do produktu komercyjnego bez warunków MPL): na podstawie osobnej umowy
+  z autorem; kontakt przez zgłoszenie w repozytorium. Do czasu umowy współtwórcy zmiany wnosi wyłącznie autor.

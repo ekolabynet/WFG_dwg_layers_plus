@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+# If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# © 2026 Piotr Mędrzycki
 """Warstwa zgodnosci dla enumow QGIS, ktore zmienily miejsce w 3.30-3.40.
 
 QGIS przeniosl wiele enumow z ``QgsFoo.PropertyBar`` do ``QgsFoo.Property.Bar``

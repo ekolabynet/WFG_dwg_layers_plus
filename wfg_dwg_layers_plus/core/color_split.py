@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+# If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# © 2026 Piotr Mędrzycki
 """Podział warstwy CAD wg koloru, grubości i typu encji.
 
 Po co. Część eksportów — zwłaszcza z systemów geodezyjnych — wrzuca całą

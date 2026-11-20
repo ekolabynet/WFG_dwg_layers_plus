@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+# If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# © 2026 Piotr Mędrzycki
 """Odzyskiwanie przypisania encji do warstw CAD wprost z pliku DXF.
 
 Po co. Wbudowany import DWG/DXF potrafi zgubić nazwę warstwy dla części encji
