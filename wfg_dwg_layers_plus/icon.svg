@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="64" height="64">
+  <!-- WFG DWG Layers+ (1.7.1): the WFG mark of the family (a field polygon with its vertices, colours of the
+       WFG Urban Environment Toolset) with a stack of three layers in the centre — CAD layers turned into
+       QGIS layers — and a small plus. -->
+  <defs>
+    <linearGradient id="fill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2f7fa3"/>
+      <stop offset="1" stop-color="#2e8f78"/>
+    </linearGradient>
+  </defs>
+  <polygon points="678,90 918,496 708,903 135,797 166,285" fill="url(#fill)" stroke="#6fc08f" stroke-width="40"
+           stroke-linejoin="round"/>
+  <circle cx="678" cy="90" r="62" fill="#6fc08f"/>
+  <circle cx="918" cy="496" r="62" fill="#6fc08f"/>
+  <circle cx="708" cy="903" r="62" fill="#6fc08f"/>
+  <circle cx="135" cy="797" r="62" fill="#6fc08f"/>
+  <circle cx="166" cy="285" r="76" fill="#6fc08f"/>
+  <circle cx="524" cy="503" r="253" fill="#eef3f4"/>
+  <!-- three layers, bottom to top -->
+  <g stroke="#ffffff" stroke-width="16" stroke-linejoin="round">
+    <polygon points="524,555 704,620 524,685 344,620" fill="#1f6f8f"/>
+    <polygon points="524,465 704,530 524,595 344,530" fill="#2a86c8"/>
+    <polygon points="524,375 704,440 524,505 344,440" fill="#6fc08f"/>
+  </g>
+  <!-- plus -->
+  <circle cx="700" cy="350" r="78" fill="#2e8f78" stroke="#eef3f4" stroke-width="18"/>
+  <path d="M700 305 V395 M655 350 H745" stroke="#ffffff" stroke-width="30" stroke-linecap="round"/>
+</svg>
