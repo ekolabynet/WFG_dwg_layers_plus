@@ -15,7 +15,6 @@ from qgis.core import (
     QgsLineSymbol,
     QgsMarkerSymbol,
     QgsMessageLog,
-    Qgis,
     QgsSimpleMarkerSymbolLayer,
     QgsNullSymbolRenderer,
     QgsPalLayerSettings,
@@ -30,6 +29,8 @@ from qgis.PyQt.QtCore import Qt
 
 from . import gpkg_schema as S
 from .qgis_compat import (
+    label_placement,
+    message_level,
     enum_value,
     label_property,
     render_unit,
@@ -236,10 +237,7 @@ def style_texts(layer, override_color=None, opts=None):
     fmt.setSizeUnit(render_unit("MapUnits"))
     settings.setFormat(fmt)
 
-    try:
-        settings.placement = QgsPalLayerSettings.Placement.OverPoint
-    except AttributeError:
-        settings.placement = QgsPalLayerSettings.OverPoint
+    settings.placement = label_placement("OverPoint")
 
     props = settings.dataDefinedProperties()
     props.setProperty(label_property("Size"), QgsProperty.fromField("height"))
@@ -476,7 +474,7 @@ def apply_style(layer, table, override_color=None, opts=None):
                 layer.name(), table, exc
             ),
             "WFG DWG Layers+",
-            Qgis.Warning,
+            message_level("Warning"),
         )
         return False
     layer.triggerRepaint()
@@ -497,10 +495,7 @@ def style_block_texts(layer):
     fmt = QgsTextFormat()
     fmt.setSizeUnit(render_unit("MapUnits"))
     settings.setFormat(fmt)
-    try:
-        settings.placement = QgsPalLayerSettings.Placement.OverPoint
-    except AttributeError:
-        settings.placement = QgsPalLayerSettings.OverPoint
+    settings.placement = label_placement("OverPoint")
     props = settings.dataDefinedProperties()
     props.setProperty(
         label_property("Size"),
@@ -558,7 +553,7 @@ def style_block_layer(layer, kind, color=None, opts=None):
                 layer.name(), exc
             ),
             "WFG DWG Layers+",
-            Qgis.Warning,
+            message_level("Warning"),
         )
         return False
     layer.triggerRepaint()

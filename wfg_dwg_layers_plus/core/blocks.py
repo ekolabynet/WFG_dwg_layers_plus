@@ -41,7 +41,7 @@ from qgis.core import (
 from . import gpkg_schema as S
 from . import naming, styler
 from .affine import insert_matrix, minsert_offsets
-from .qgis_compat import field_type, vector_file_writer_action
+from .qgis_compat import field_type, vector_file_writer_action, writer_no_error
 from ..i18n import tr
 from .log import warn_exception
 
@@ -786,7 +786,7 @@ def _persist(gpkg_path, result, style_opts=None):
             replaced.append((block_name, kind, mem))
             continue
         err = written[0] if isinstance(written, (tuple, list)) else written
-        if err not in (QgsVectorFileWriter.NoError, 0):
+        if err not in (writer_no_error(), 0):
             result.warnings.append(tr("Zapis {0} nieudany.").format(target))
             replaced.append((block_name, kind, mem))
             continue

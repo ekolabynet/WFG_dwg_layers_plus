@@ -534,6 +534,69 @@ class TestWarnException(unittest.TestCase):
             warn_exception("Zły {1} znacznik", Layer())
 
 
+class TestQtEnums(unittest.TestCase):
+    """Scoped names for Qt6 / QGIS 4, old names for QGIS 3 with Qt5."""
+
+    def _with_qgis_core(self, **names):
+        import types
+
+        core = types.ModuleType("qgis.core")
+        for key, value in names.items():
+            setattr(core, key, value)
+        pkg = types.ModuleType("qgis")
+        pkg.core = core
+        saved = {k: sys.modules.get(k) for k in ("qgis", "qgis.core")}
+        sys.modules["qgis"], sys.modules["qgis.core"] = pkg, core
+
+        def restore():
+            for k, v in saved.items():
+                if v is None:
+                    sys.modules.pop(k, None)
+                else:
+                    sys.modules[k] = v
+        self.addCleanup(restore)
+
+    def test_qt6_scoped_names(self):
+        from wfg_dwg_layers_plus.core import qgis_compat as C
+
+        class Qgis(object):
+            class MessageLevel(object):
+                Info, Warning = "ML.Info", "ML.Warning"
+
+            class LabelPlacement(object):
+                OverPoint = "LP.OverPoint"
+
+        class QgsVectorFileWriter(object):
+            class WriterError(object):
+                NoError = "WE.NoError"
+
+        self._with_qgis_core(Qgis=Qgis, QgsPalLayerSettings=object,
+                             QgsVectorFileWriter=QgsVectorFileWriter)
+        self.assertEqual(C.message_level("Warning"), "ML.Warning")
+        self.assertEqual(C.label_placement("OverPoint"), "LP.OverPoint")
+        self.assertEqual(C.writer_no_error(), "WE.NoError")
+
+    def test_qt5_old_names(self):
+        from wfg_dwg_layers_plus.core import qgis_compat as C
+
+        class Qgis(object):
+            class MessageLevel(object):
+                pass          # PyQt5: members live on Qgis, not on the enum
+            Info, Warning = 0, 1
+
+        class QgsPalLayerSettings(object):
+            OverPoint = 1
+
+        class QgsVectorFileWriter(object):
+            NoError = 0
+
+        self._with_qgis_core(Qgis=Qgis, QgsPalLayerSettings=QgsPalLayerSettings,
+                             QgsVectorFileWriter=QgsVectorFileWriter)
+        self.assertEqual(C.message_level("Warning"), 1)
+        self.assertEqual(C.label_placement("OverPoint"), 1)
+        self.assertEqual(C.writer_no_error(), 0)
+
+
 class TestColorSplit(unittest.TestCase):
     """Kubelki podzialu po kolorze."""
 

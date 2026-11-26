@@ -133,3 +133,30 @@ def vector_file_writer_action(name):
         "ActionOnExistingFile." + name,
         name,
     )
+
+
+def message_level(name):
+    """``Qgis.MessageLevel.<name>`` (Qt6 / QGIS 4) or the older ``Qgis.<name>``."""
+    from qgis.core import Qgis
+
+    return enum_value(Qgis, "MessageLevel." + name, name)
+
+
+def label_placement(name):
+    """``Qgis.LabelPlacement.<name>`` (3.26+) or ``QgsPalLayerSettings`` forms."""
+    from qgis.core import QgsPalLayerSettings
+
+    try:
+        from qgis.core import Qgis
+
+        return enum_value(Qgis, "LabelPlacement." + name)
+    except Exception:  # older QGIS API: next fallback  # nosec B110
+        pass
+    return enum_value(QgsPalLayerSettings, "Placement." + name, name)
+
+
+def writer_no_error():
+    """``QgsVectorFileWriter.WriterError.NoError`` or the older ``NoError``."""
+    from qgis.core import QgsVectorFileWriter
+
+    return enum_value(QgsVectorFileWriter, "WriterError.NoError", "NoError")

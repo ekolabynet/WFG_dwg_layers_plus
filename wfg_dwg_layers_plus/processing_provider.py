@@ -27,6 +27,7 @@ from qgis.core import (
 )
 from qgis.PyQt.QtGui import QIcon
 
+from .core.qgis_compat import enum_value
 from .i18n import tr
 
 ICON = os.path.join(os.path.dirname(__file__), "icon.png")
@@ -34,18 +35,21 @@ ICON = os.path.join(os.path.dirname(__file__), "icon.png")
 
 def _no_threading_flag():
     """Qgis.ProcessingAlgorithmFlag.NoThreading (3.36+, QGIS 4) or the older QgsProcessingAlgorithm flag."""
+    from qgis.core import Qgis
+
     try:
-        from qgis.core import Qgis
-        return Qgis.ProcessingAlgorithmFlag.NoThreading
+        return enum_value(Qgis, "ProcessingAlgorithmFlag.NoThreading")
     except AttributeError:
-        return QgsProcessingAlgorithm.FlagNoThreading
+        return enum_value(QgsProcessingAlgorithm, "Flag.FlagNoThreading", "FlagNoThreading")
 
 
 def _file_behavior():
+    from qgis.core import Qgis
+
     try:
-        return QgsProcessingParameterFile.Behavior.File
+        return enum_value(Qgis, "ProcessingFileParameterBehavior.File")
     except AttributeError:
-        return QgsProcessingParameterFile.File
+        return enum_value(QgsProcessingParameterFile, "Behavior.File", "File")
 
 
 def _number_type(kind):

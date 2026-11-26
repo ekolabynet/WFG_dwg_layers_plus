@@ -16,7 +16,7 @@ from qgis.core import (
 
 from . import gpkg_schema as S
 from . import gpkg_reader, naming
-from .qgis_compat import vector_file_writer_action
+from .qgis_compat import vector_file_writer_action, writer_no_error
 from ..i18n import tr
 from .log import warn_exception
 
@@ -119,7 +119,7 @@ def materialize(
             continue
 
         err = written[0] if isinstance(written, (tuple, list)) else written
-        if err not in (QgsVectorFileWriter.NoError, 0):
+        if err not in (writer_no_error(), 0):
             msg = written[1] if isinstance(written, (tuple, list)) and len(written) > 1 else ""
             result.errors.append("{0}/{1}: {2}".format(info.name, table, msg))
             continue

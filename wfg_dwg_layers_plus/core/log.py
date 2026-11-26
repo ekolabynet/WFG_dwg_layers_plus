@@ -42,9 +42,11 @@ def warn_exception(what, *args):
         pass
     text = "{0}: {1}".format(what, exc) if exc is not None else str(what)
     try:
-        from qgis.core import Qgis, QgsMessageLog
+        from qgis.core import QgsMessageLog
 
-        QgsMessageLog.logMessage(text, TAG, Qgis.Warning)
+        from .qgis_compat import message_level
+
+        QgsMessageLog.logMessage(text, TAG, message_level("Warning"))
     except Exception:  # nosec B110
         # outside QGIS (tests, qgis_process without a GUI log) there is nowhere
         # to write; a warning must never become an error

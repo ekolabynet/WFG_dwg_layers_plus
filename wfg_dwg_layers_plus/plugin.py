@@ -169,37 +169,37 @@ class DwgLayersPlusPlugin(object):
         # okno tworzymy za kazdym razem — stan i tak wraca z QgsSettings,
         # a dzieki temu nie trzyma referencji do usunietych warstw
         self.dialog = ImportDialog(self.iface)
-        self.dialog.exec_() if hasattr(self.dialog, "exec_") else self.dialog.exec()
+        self.dialog.exec()
 
     def run_restyle(self):
         from .gui.restyle_dialog import RestyleDialog
 
         dialog = RestyleDialog(self.iface)
-        dialog.exec_() if hasattr(dialog, "exec_") else dialog.exec()
+        dialog.exec()
 
     def run_attributes(self):
         from .gui.attributes_dialog import AttributesDialog
 
         dialog = AttributesDialog(self.iface)
-        dialog.exec_() if hasattr(dialog, "exec_") else dialog.exec()
+        dialog.exec()
 
     def run_encoding(self):
         from .gui.encoding_dialog import EncodingDialog
 
         dialog = EncodingDialog(self.iface)
-        dialog.exec_() if hasattr(dialog, "exec_") else dialog.exec()
+        dialog.exec()
 
     def run_layer_fix(self):
         from .gui.layer_fix_dialog import LayerFixDialog
 
         dialog = LayerFixDialog(self.iface)
-        dialog.exec_() if hasattr(dialog, "exec_") else dialog.exec()
+        dialog.exec()
 
     def run_color_split(self):
         from .gui.color_split_dialog import ColorSplitDialog
 
         dialog = ColorSplitDialog(self.iface)
-        dialog.exec_() if hasattr(dialog, "exec_") else dialog.exec()
+        dialog.exec()
 
     def show_about(self):
         from qgis.PyQt.QtWidgets import QMessageBox

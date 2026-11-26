@@ -7,18 +7,19 @@
 
 import os
 
-from qgis.core import Qgis, QgsFeedback, QgsMessageLog, QgsProject
+from qgis.core import QgsFeedback, QgsMessageLog, QgsProject
 
 from . import blocks as blocks_mod
 from . import gpkg_reader, gpkg_schema as S, materializer, producer_builtin
 from . import producer_ogr, tree_builder
 from ..i18n import tr
+from .qgis_compat import message_level
 
 LOG_TAG = "WFG DWG Layers+"
 
 
-def log(message, level=Qgis.Info):
-    QgsMessageLog.logMessage(str(message), LOG_TAG, level)
+def log(message, level=None):
+    QgsMessageLog.logMessage(str(message), LOG_TAG, message_level("Info") if level is None else level)
 
 
 class RunConfig(object):
@@ -139,7 +140,7 @@ def run(config, iface=None, feedback=None, progress_cb=None):
         )
         result.materialized = materialized
         for err in materialized.errors:
-            log(err, Qgis.Warning)
+            log(err, message_level("Warning"))
             result.messages.append(err)
 
     # bloki dziedzicza ten sam wyglad co reszta importu
@@ -153,7 +154,7 @@ def run(config, iface=None, feedback=None, progress_cb=None):
     )
     result.tree = tree
     for warning in tree.warnings:
-        log(warning, Qgis.Warning)
+        log(warning, message_level("Warning"))
 
     if config.tree.block_mode == S.BlockMode.COMPOSITE:
         report(75, tr("Skladanie blokow..."))
@@ -163,7 +164,7 @@ def run(config, iface=None, feedback=None, progress_cb=None):
                 "blokow. Definicje blokow moga byc niekompletne — zaimportuj "
                 "ponownie w trybie bez rozwijania.")
             )
-            log(msg, Qgis.Warning)
+            log(msg, message_level("Warning"))
             result.messages.append(msg)
         blk = blocks_mod.build_block_layers(
             gpkg, inv, cad_layers, config.block, feedback,
@@ -172,7 +173,7 @@ def run(config, iface=None, feedback=None, progress_cb=None):
         )
         result.blocks = blk
         for warning in set(blk.warnings):
-            log(warning, Qgis.Warning)
+            log(warning, message_level("Warning"))
         entries = list(blk.layers)
         if blk.anchor_layer is not None:
             entries.append(("_kotwice", S.KIND_POINT, blk.anchor_layer))

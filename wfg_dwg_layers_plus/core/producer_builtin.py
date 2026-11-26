@@ -17,7 +17,7 @@ do projektu — i te tymczasowe warstwy usuwamy, bo wlasne drzewo zbudujemy sami
 
 import os
 
-from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMessageLog, QgsProject, QgsSettings
+from qgis.core import QgsCoordinateReferenceSystem, QgsMessageLog, QgsProject, QgsSettings
 from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import (
     QAbstractButton, QAction, QApplication, QDialog, QDialogButtonBox, QLineEdit, QMessageBox, QTableWidget,
@@ -26,6 +26,7 @@ from qgis.PyQt.QtWidgets import (
 from . import gpkg_schema as S
 from ..i18n import tr
 from .log import warn_exception
+from .qgis_compat import message_level
 
 ACTION_NAME = "mActionDwgImport"
 
@@ -121,8 +122,8 @@ class _AutoDriver(object):
     def start(self):
         QTimer.singleShot(150, self._poll)
 
-    def _log(self, msg, level=Qgis.Info):
-        QgsMessageLog.logMessage(msg, "WFG DWG Layers+", level)
+    def _log(self, msg, level=None):
+        QgsMessageLog.logMessage(msg, "WFG DWG Layers+", message_level("Info") if level is None else level)
 
     def _poll(self):
         dlg = QApplication.activeModalWidget()
@@ -135,7 +136,7 @@ class _AutoDriver(object):
             self._drive(dlg)
         except Exception as exc:  # noqa: BLE001  any surprise -> the user finishes by hand
             self.note = str(exc)
-            self._log("auto import stopped: %s" % exc, Qgis.Warning)
+            self._log("auto import stopped: %s" % exc, message_level("Warning"))
 
     @staticmethod
     def _find_edit(dlg, *keys):
@@ -216,7 +217,7 @@ def run_builtin_import(iface, block_mode, use_curves=True, cleanup=True, auto=Fa
     if driver is not None and not driver.done:
         QgsMessageLog.logMessage(
             "auto import fell back to the dialog: %s" % (driver.note or "dialog not found"),
-            "WFG DWG Layers+", Qgis.Warning)
+            "WFG DWG Layers+", message_level("Warning"))
 
     after = project.mapLayers()
     new_ids = [lid for lid in after if lid not in before_layers]
