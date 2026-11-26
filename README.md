@@ -73,7 +73,7 @@ Wskazujesz DWG albo DXF, a wtyczka sama uruchamia wbudowany import QGIS – wype
 pracuje na wyniku: z okna wtyczki, z menu *Warstwa → Dodaj warstwę* albo z Przybornika Processing. Interfejs wtyczki
 jest w języku QGIS: po polsku w polskim QGIS, w pozostałych po angielsku.
 
-**Gdzie jest wtyczka:** menu *Wektor → WFG DWG Layers+*, *Warstwa → Dodaj warstwę → Dodaj warstwy DWG/DXF+…*
+**Gdzie jest wtyczka:** menu *WorkFieldGIS → WFG DWG Layers+*, *Warstwa → Dodaj warstwę → Dodaj warstwy DWG/DXF+…*
 (także na pasku Zarządzanie warstwami) oraz **Przybornik Processing** → *WFG DWG Layers+*: Importuj DWG/DXF jako
 warstwy, Odzyskaj warstwy z rysunku, Napraw kodowanie, Wczytaj atrybuty bloków z rysunku — do modeli i przetwarzania
 wsadowego. Wbudowany import DWG/DXF nie ma API w Pythonie, więc wtyczka steruje jego oknem: domyślnie sama wpisuje rysunek,
@@ -120,7 +120,7 @@ mój_rysunek/
    albo zbuduj go sam: `./make_zip.sh`.
 2. QGIS → *Wtyczki → Zarządzaj wtyczkami → Zainstaluj z pliku ZIP*.
 3. Wskaż plik i kliknij *Zainstaluj wtyczkę*.
-4. Wtyczka pojawi się w menu *Wektor → WFG DWG Layers+* oraz na pasku narzędzi.
+4. Wtyczka pojawi się w menu *WorkFieldGIS → WFG DWG Layers+* (wspólne menu wtyczek WFG, przed Pomocą) oraz na pasku narzędzi.
 
 Wymagania: QGIS 3.28 lub nowszy (także QGIS 4). Żadnych bibliotek do doinstalowania.
 
@@ -146,7 +146,7 @@ z wcześniejszych importów działają bez zmian.
 
 ### Ścieżka podstawowa (DWG albo DXF)
 
-1. *Wektor → WFG DWG Layers+ → Importuj DWG/DXF jako warstwy…*
+1. *WorkFieldGIS → WFG DWG Layers+ → Importuj DWG/DXF jako warstwy…*
 2. Wskaż rysunek, ustaw układ współrzędnych, wybierz tryb bloków.
 3. *Importuj* — otworzy się wbudowane okno importu QGIS z już ustawionym trybem bloków. Wskaż w nim plik i potwierdź.
 4. Wtyczka posprząta po nim tymczasowe warstwy i zbuduje własne drzewo.
@@ -242,13 +242,13 @@ Próbkujemy garstkę obiektów zamiast całej tabeli: przy 400 warstwach pełny 
 
 ### Poprawa bez ponownego importu
 
-*Wektor → WFG DWG Layers+ → Popraw wygląd wczytanych warstw…* nakłada style na warstwy, które już są w projekcie. Rozpoznaje je po `layername=` w źródle, po tabeli `dwgplus_layer_map` i po sufiksie nazwy — więc działa i w trybie filtrów, i po materializacji. Przy wielkim rysunku to sekundy zamiast ponownego czytania DXF-a.
+*WorkFieldGIS → WFG DWG Layers+ → Popraw wygląd wczytanych warstw…* nakłada style na warstwy, które już są w projekcie. Rozpoznaje je po `layername=` w źródle, po tabeli `dwgplus_layer_map` i po sufiksie nazwy — więc działa i w trybie filtrów, i po materializacji. Przy wielkim rysunku to sekundy zamiast ponownego czytania DXF-a.
 
 ## Atrybuty bloków — dane, których QGIS w ogóle nie widzi
 
 Kota wysokościowa, numer drzewa, opis studzienki — w CAD-zie to zwykle **atrybut bloku** (ATTRIB), a nie tekst. Takich wartości w GeoPackage nie ma i nie będzie, bo biblioteka `libdxfrw`, której QGIS używa i do DWG, i do DXF, **nie zna atrybutów**. W jej enumie typów encji `ATTDEF` i `ATTRIB` są dosłownie zakomentowane, a `DRW_Interface` nie ma żadnego `addAttrib`. W czytniku DXF atrybuty wpadają do zbiorczego `else`, który przewija plik do następnej encji; w czytniku DWG lądują w `default:`. Wartość nie przekracza granicy między biblioteką a QGIS-em.
 
-*Wektor → WFG DWG Layers+ → Wczytaj atrybuty bloków z rysunku…* omija ten problem:
+*WorkFieldGIS → WFG DWG Layers+ → Wczytaj atrybuty bloków z rysunku…* omija ten problem:
 
 1. czyta rysunek **sterownikiem DXF w GDAL** (wbudowany zawsze, zero zależności) z `DXF_INLINE_BLOCKS=FALSE` — tylko w tym trybie GDAL wystawia pole `BlockAttributes`,
 2. zapisuje wynik do tabeli `dwgplus_block_attributes` w tym samym GeoPackage: jeden wiersz na wstawienie, jedna kolumna `att_<ZNACZNIK>` na znacznik (kolumny czysto liczbowe dostają typ REAL, więc od razu nadają się do klasyfikacji),
@@ -272,7 +272,7 @@ W paczce jest `diagnostyka.py`. Wklejony do konsoli Pythona QGIS wypisuje dla ka
 
 ## Napraw kodowanie
 
-*Wektor → WFG DWG Layers+ → Napraw kodowanie…*
+*WorkFieldGIS → WFG DWG Layers+ → Napraw kodowanie…*
 
 DXF od wersji R2007 ma treść w UTF-8 i nagłówkowa strona kodowa `$DWGCODEPAGE` powinna być wtedy ignorowana. Wiele CAD-ów zostawia tam starą wartość, a biblioteka czytająca stosuje ją posłusznie — czyta bajty UTF-8 tak, jakby były w cp1250:
 
@@ -298,7 +298,7 @@ Poprawne napisy i liczby (`0,0,0,255`, `102,9`, `rzędne kanałów wodnych`) zos
 
 ## Odzyskaj warstwy z rysunku
 
-*Wektor → WFG DWG Layers+ → Odzyskaj warstwy z rysunku…*
+*WorkFieldGIS → WFG DWG Layers+ → Odzyskaj warstwy z rysunku…*
 
 Objaw jest charakterystyczny: `inserts` i `texts` mają dziesiątki poprawnych nazw warstw CAD, a `lines`, `polylines` i `hatches` mają jedną — `0`. Wygląda to na rysunek bez warstw, ale nim nie jest. W jednym pliku z zasobu geodezyjnego było tak:
 
@@ -337,7 +337,7 @@ Bardzo stare DXF-y bez uchwytów encji są poza zasięgiem tej metody; okno powi
 
 ## Podziel warstwę wg koloru
 
-*Wektor → WFG DWG Layers+ → Podziel warstwę wg koloru…*
+*WorkFieldGIS → WFG DWG Layers+ → Podziel warstwę wg koloru…*
 
 To narzędzie jest dla przypadku, w którym poprzednie nie ma czego odzyskać: rysunek naprawdę trzyma całą kreskę na warstwie `0`, a treść rozróżnia wyłącznie wygląd. Zanim się po nie sięgnie, warto sprawdzić właśnie „Odzyskaj warstwy z rysunku" — objaw jest identyczny, a przyczyna zupełnie inna.
 

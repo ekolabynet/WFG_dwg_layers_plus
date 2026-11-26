@@ -11,6 +11,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from .i18n import LANG, SOURCE, tr
 from .core.log import warn_exception
+from .wfg_menu import WfgSubmenu
 
 MENU = "WFG DWG Layers+"
 OLD_SETTINGS_PREFIX = "dwg_layers_plus/"
@@ -41,6 +42,7 @@ class DwgLayersPlusPlugin(object):
         self.dialog = None
         self.provider = None
         self.add_layer_action = None
+        self.submenu = None
 
     def initProcessing(self):  # noqa: N802
         """The plugin's tools in the Processing Toolbox (models, batch runs)."""
@@ -59,6 +61,8 @@ class DwgLayersPlusPlugin(object):
             warn_exception(tr("Nie udało się przenieść ustawień z poprzedniej nazwy wtyczki"))
         icon_path = os.path.join(os.path.dirname(__file__), "icon.png")
         icon = QIcon(icon_path) if os.path.exists(icon_path) else QIcon()
+        # the plugin's submenu in the shared menu "WorkFieldGIS" of the WFG plugins (before 1.9.8: Vector menu)
+        self.submenu = WfgSubmenu(self.iface, MENU, "mWfgDwgLayersPlusMenu", icon)
 
         action = QAction(icon, tr("Importuj DWG/DXF jako warstwy…"), self.iface.mainWindow())
         action.setObjectName("dwgLayersPlusImport")
@@ -66,7 +70,7 @@ class DwgLayersPlusPlugin(object):
             tr("Import DWG/DXF z warstwami nazwanymi jak w CAD, w czterech grupach")
         )
         action.triggered.connect(self.run)
-        self.iface.addPluginToVectorMenu(MENU, action)
+        self.submenu.add_action(action)
         self.iface.addToolBarIcon(action)
         self.actions.append(action)
 
@@ -79,7 +83,7 @@ class DwgLayersPlusPlugin(object):
             "bez ponownego importu rysunku")
         )
         restyle.triggered.connect(self.run_restyle)
-        self.iface.addPluginToVectorMenu(MENU, restyle)
+        self.submenu.add_action(restyle)
         self.actions.append(restyle)
 
         attrs = QAction(
@@ -91,7 +95,7 @@ class DwgLayersPlusPlugin(object):
             "import DWG/DXF nie widzi, i skleja je z importem po uchwycie encji")
         )
         attrs.triggered.connect(self.run_attributes)
-        self.iface.addPluginToVectorMenu(MENU, attrs)
+        self.submenu.add_action(attrs)
         self.actions.append(attrs)
 
         enc = QAction(icon, tr("Napraw kodowanie…"), self.iface.mainWindow())
@@ -101,7 +105,7 @@ class DwgLayersPlusPlugin(object):
             "nazwach bloków i treści tekstów")
         )
         enc.triggered.connect(self.run_encoding)
-        self.iface.addPluginToVectorMenu(MENU, enc)
+        self.submenu.add_action(enc)
         self.actions.append(enc)
 
         layerfix = QAction(
@@ -113,7 +117,7 @@ class DwgLayersPlusPlugin(object):
             "warstwy — przepisuje przypisanie z DXF-a po uchwycie encji")
         )
         layerfix.triggered.connect(self.run_layer_fix)
-        self.iface.addPluginToVectorMenu(MENU, layerfix)
+        self.submenu.add_action(layerfix)
         self.actions.append(layerfix)
 
         split = QAction(icon, tr("Podziel warstwę wg koloru…"), self.iface.mainWindow())
@@ -123,7 +127,7 @@ class DwgLayersPlusPlugin(object):
             "a treść rozróżnia barwa")
         )
         split.triggered.connect(self.run_color_split)
-        self.iface.addPluginToVectorMenu(MENU, split)
+        self.submenu.add_action(split)
         self.actions.append(split)
 
         # Layer > Add Layer > Add DWG/DXF+ Layers… (and the Manage Layers toolbar), next to the other sources
@@ -141,14 +145,18 @@ class DwgLayersPlusPlugin(object):
 
         about = QAction(icon, tr("O wtyczce…"), self.iface.mainWindow())
         about.triggered.connect(self.show_about)
-        self.iface.addPluginToVectorMenu(MENU, about)
+        self.submenu.add_separator()
+        self.submenu.add_action(about)
         self.actions.append(about)
+        self.submenu.install()
 
     def unload(self):
         for action in self.actions:
-            self.iface.removePluginVectorMenu(MENU, action)
             self.iface.removeToolBarIcon(action)
         self.actions = []
+        if self.submenu is not None:
+            self.submenu.remove()
+            self.submenu = None
         if self.add_layer_action is not None:
             try:
                 self.iface.removeAddLayerAction(self.add_layer_action)
