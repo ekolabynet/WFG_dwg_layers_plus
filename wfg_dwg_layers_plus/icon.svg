@@ -1,28 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="64" height="64">
-  <!-- WFG DWG Layers+ (1.7.1): the WFG mark of the family (a field polygon with its vertices, colours of the
-       WFG Urban Environment Toolset) with a stack of three layers in the centre — CAD layers turned into
-       QGIS layers — and a small plus. -->
+  <!-- WFG DWG Layers+ (1.9.7): the WFG pentagon with its vertices, cut into five horizontal layers in the
+       Viridis palette without its yellow end (CAD layers become QGIS layers), and a plus cut out in the
+       middle (the "+" of the name). Transparent where cut. -->
   <defs>
-    <linearGradient id="fill" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2f7fa3"/>
-      <stop offset="1" stop-color="#2e8f78"/>
-    </linearGradient>
+  <clipPath id="pent">
+  <polygon points="678,90 918,496 708,903 135,797 166,285"/>
+  <circle cx="678" cy="90" r="70"/>
+  <circle cx="918" cy="496" r="70"/>
+  <circle cx="708" cy="903" r="70"/>
+  <circle cx="135" cy="797" r="70"/>
+  <circle cx="166" cy="285" r="70"/>
+  </clipPath>
+  <mask id="cut" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
+  <rect width="1024" height="1024" fill="#fff"/>
+  <rect x="469" y="273" width="110" height="460" rx="19" fill="#000"/>
+  <rect x="294" y="448" width="460" height="110" rx="19" fill="#000"/>
+  </mask>
   </defs>
-  <polygon points="678,90 918,496 708,903 135,797 166,285" fill="url(#fill)" stroke="#6fc08f" stroke-width="40"
-           stroke-linejoin="round"/>
-  <circle cx="678" cy="90" r="62" fill="#6fc08f"/>
-  <circle cx="918" cy="496" r="62" fill="#6fc08f"/>
-  <circle cx="708" cy="903" r="62" fill="#6fc08f"/>
-  <circle cx="135" cy="797" r="62" fill="#6fc08f"/>
-  <circle cx="166" cy="285" r="76" fill="#6fc08f"/>
-  <circle cx="524" cy="503" r="253" fill="#eef3f4"/>
-  <!-- three layers, bottom to top -->
-  <g stroke="#ffffff" stroke-width="16" stroke-linejoin="round">
-    <polygon points="524,555 704,620 524,685 344,620" fill="#1f6f8f"/>
-    <polygon points="524,465 704,530 524,595 344,530" fill="#2a86c8"/>
-    <polygon points="524,375 704,440 524,505 344,440" fill="#6fc08f"/>
+  <g clip-path="url(#pent)" mask="url(#cut)">
+  <rect x="0" y="19.0" width="1024" height="192.6" fill="#7ad151"/>
+  <rect x="0" y="209.6" width="1024" height="192.6" fill="#22a884"/>
+  <rect x="0" y="400.2" width="1024" height="192.6" fill="#2a788e"/>
+  <rect x="0" y="590.8" width="1024" height="192.6" fill="#414487"/>
+  <rect x="0" y="781.4" width="1024" height="192.6" fill="#440154"/>
   </g>
-  <!-- plus -->
-  <circle cx="700" cy="350" r="78" fill="#2e8f78" stroke="#eef3f4" stroke-width="18"/>
-  <path d="M700 305 V395 M655 350 H745" stroke="#ffffff" stroke-width="30" stroke-linecap="round"/>
 </svg>
