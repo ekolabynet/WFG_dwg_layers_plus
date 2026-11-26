@@ -34,6 +34,7 @@ from qgis.PyQt.QtWidgets import (
 from ..core import encoding_fix as EF
 from ..core import layer_fix as LF
 from ..i18n import tr
+from ..core.log import warn_exception
 
 SETTINGS_PREFIX = "wfg_dwg_layers_plus/layerfix/"
 
@@ -373,7 +374,7 @@ class LayerFixDialog(QDialog):
                 self, "WFG DWG Layers+",
                 tr("Zakończ edycję tych warstw przed naprawą — ich bufor "
                 "zapisałby stare wartości z powrotem:\n\n")
-                + "\n".join(l.name() for l in w_edycji[:10]),
+                + "\n".join(lyr.name() for lyr in w_edycji[:10]),
             )
             return
 
@@ -413,7 +414,7 @@ class LayerFixDialog(QDialog):
                 if self.iface is not None:
                     self.iface.mapCanvas().refreshAllLayers()
             except Exception:
-                pass
+                warn_exception(tr("Nie udało się odświeżyć warstw na mapie"))
             QApplication.restoreOverrideCursor()
             self.progress.setVisible(False)
             self.buttons.setEnabled(True)

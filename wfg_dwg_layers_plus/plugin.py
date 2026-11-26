@@ -10,6 +10,7 @@ import os
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from .i18n import LANG, SOURCE, tr
+from .core.log import warn_exception
 
 MENU = "WFG DWG Layers+"
 OLD_SETTINGS_PREFIX = "dwg_layers_plus/"
@@ -55,7 +56,7 @@ class DwgLayersPlusPlugin(object):
         try:
             migrate_settings()
         except Exception:  # settings must never stop the plugin from loading
-            pass
+            warn_exception(tr("Nie udało się przenieść ustawień z poprzedniej nazwy wtyczki"))
         icon_path = os.path.join(os.path.dirname(__file__), "icon.png")
         icon = QIcon(icon_path) if os.path.exists(icon_path) else QIcon()
 

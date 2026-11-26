@@ -27,7 +27,7 @@ wiec sa tylko wykrywane.
 import os
 import re
 import shutil
-import subprocess
+import subprocess  # nosec B404
 import tempfile
 
 from . import gpkg_schema as S
@@ -88,7 +88,8 @@ def convert_dwg_to_dxf(dwg_path, out_dir=None, version="ACAD2018", timeout=600):
     if libredwg:
         cmd = [libredwg, "-o", target, dwg_path]
         try:
-            subprocess.run(cmd, check=True, timeout=timeout,
+            # converter found by shutil.which, arguments as a list, no shell
+            subprocess.run(cmd, check=True, timeout=timeout,  # nosec B603
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except Exception as exc:  # noqa: BLE001
             raise OgrImportError(tr("dwg2dxf nie zadzialal: {0}").format(exc))
@@ -101,7 +102,7 @@ def convert_dwg_to_dxf(dwg_path, out_dir=None, version="ACAD2018", timeout=600):
         shutil.copy2(dwg_path, os.path.join(src_dir, os.path.basename(dwg_path)))
         cmd = [oda, src_dir, out_dir, version, "DXF", "0", "1"]
         try:
-            subprocess.run(cmd, check=False, timeout=timeout,
+            subprocess.run(cmd, check=False, timeout=timeout,  # nosec B603
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except Exception as exc:  # noqa: BLE001
             raise OgrImportError(tr("ODA File Converter nie zadzialal: {0}").format(exc))
@@ -288,7 +289,7 @@ def import_dxf(
         if not had_exceptions:
             try:
                 gdal.DontUseExceptions()
-            except Exception:
+            except Exception:  # restoring the GDAL exception mode  # nosec B110
                 pass
 
 

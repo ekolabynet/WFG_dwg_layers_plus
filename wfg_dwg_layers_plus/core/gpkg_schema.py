@@ -221,6 +221,16 @@ def sql_quote(value):
     return "'" + str(value).replace("'", "''") + "'"
 
 
+def sql_ident(name):
+    """Quotes a table or column name for SQL (doubles inner double quotes).
+
+    Values go through ``?`` parameters or :func:`sql_quote`; names cannot be
+    parameters, so every name that does not come from this module (tables and
+    columns read from the GeoPackage itself) goes through here.
+    """
+    return '"' + str(name).replace('"', '""') + '"'
+
+
 def layer_filter(cad_layer):
     """Pelny subset string dla jednej warstwy CAD."""
     return "{0} = {1} AND {2}".format(C_LAYER, sql_quote(cad_layer), BASE_FILTER)

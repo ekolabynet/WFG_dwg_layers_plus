@@ -23,6 +23,7 @@ from qgis.PyQt.QtWidgets import (
 
 from ..core import restyle, styler
 from ..i18n import tr
+from ..core.log import warn_exception
 
 SETTINGS_PREFIX = "wfg_dwg_layers_plus/"
 
@@ -151,11 +152,11 @@ class RestyleDialog(QDialog):
                 for layer_id in result.layer_ids:
                     view.refreshLayerSymbology(layer_id)
             except Exception:
-                pass
+                warn_exception(tr("Nie udało się odświeżyć legendy"))
             try:
                 self.iface.mapCanvas().refreshAllLayers()
             except Exception:
-                pass
+                warn_exception(tr("Nie udało się odświeżyć warstw na mapie"))
 
     def _save(self):
         s = QgsSettings()

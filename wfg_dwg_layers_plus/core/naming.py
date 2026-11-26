@@ -27,6 +27,19 @@ _PL_MAP = {
 MAX_TABLE_NAME = 60
 
 
+def _short_digest(raw):
+    """Six hex characters that keep shortened table names distinct.
+
+    MD5 is used only as a checksum here, not for security. The digest stays the
+    same as in earlier versions, so tables created before keep their names.
+    """
+    data = raw.encode("utf-8")
+    try:
+        return hashlib.md5(data, usedforsecurity=False).hexdigest()[:6]
+    except TypeError:  # Python < 3.9 has no usedforsecurity
+        return hashlib.md5(data).hexdigest()[:6]  # nosec B324
+
+
 def display_name(cad_layer, table, suffixes=None):
     """Nazwa warstwy w legendzie QGIS: ``<warstwa_CAD><sufiks>``.
 
@@ -59,7 +72,7 @@ def sanitize_table_name(name, prefix="l_"):
     if out[0].isdigit():
         out = prefix + out
     if len(out) > MAX_TABLE_NAME:
-        digest = hashlib.md5(raw.encode("utf-8")).hexdigest()[:6]
+        digest = _short_digest(raw)
         out = out[: MAX_TABLE_NAME - 7] + "_" + digest
     return out
 

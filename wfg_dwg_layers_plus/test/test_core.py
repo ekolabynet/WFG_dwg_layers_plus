@@ -191,6 +191,10 @@ class TestSchema(unittest.TestCase):
     def test_sql_quote_escapes(self):
         self.assertEqual(S.sql_quote("O'Brien"), "'O''Brien'")
 
+    def test_sql_ident_escapes(self):
+        self.assertEqual(S.sql_ident("layer"), '"layer"')
+        self.assertEqual(S.sql_ident('a"b'), '"a""b"')
+
     def test_layer_filter(self):
         self.assertEqual(
             S.layer_filter("mur"),
@@ -452,6 +456,82 @@ class TestLayerFixApply(unittest.TestCase):
         podglad = LF.plan(self.gpkg, scan)
         self.assertEqual(podglad.changed, 1)
         self.assertEqual(podglad.mojibake, 1)
+
+
+class TestEncodingFixNames(unittest.TestCase):
+    """Table and column names come from the GeoPackage itself, so they are
+    quoted with sql_ident: a double quote inside a name must neither skip the
+    table nor send the repair to another column."""
+
+    def setUp(self):
+        import sqlite3
+        import tempfile
+
+        self.gpkg = tempfile.NamedTemporaryFile(suffix=".gpkg", delete=False).name
+        self.addCleanup(self._sprzatnij)
+        conn = sqlite3.connect(self.gpkg)
+        # the second column name would, unquoted, turn the UPDATE into
+        # SET "opis" = ?, "inna" = ? ... and overwrite the column "inna"
+        self.kol = 'opis" = ?, "inna'
+        conn.execute(
+            'CREATE TABLE "rysunek ""A""" (fid INTEGER PRIMARY KEY, '
+            '"opis ""1""" TEXT, {0} TEXT, inna TEXT)'.format(S.sql_ident(self.kol))
+        )
+        conn.execute(
+            'INSERT INTO "rysunek ""A""" VALUES (1, ?, ?, ?)',
+            ("rzÄ™dna", "kanaĹ‚", "bez zmian"),
+        )
+        conn.commit()
+        conn.close()
+
+    def _sprzatnij(self):
+        import glob
+
+        for path in [self.gpkg] + glob.glob(self.gpkg + ".bak*"):
+            if os.path.exists(path):
+                os.unlink(path)
+
+    def test_names_with_double_quotes_are_repaired_in_place(self):
+        import sqlite3
+
+        from wfg_dwg_layers_plus.core import encoding_fix as EF
+
+        scan = EF.scan_gpkg(self.gpkg)
+        self.assertEqual(
+            sorted(scan.columns),
+            sorted([('rysunek "A"', 'opis "1"'), ('rysunek "A"', self.kol)]),
+        )
+        zmian, _ = EF.apply_gpkg(self.gpkg, make_backup=False)
+        self.assertEqual(zmian, 2)
+        conn = sqlite3.connect(self.gpkg)
+        row = conn.execute('SELECT * FROM "rysunek ""A"""').fetchone()
+        conn.close()
+        self.assertEqual(row, (1, "rzędna", "kanał", "bez zmian"))
+
+
+class TestWarnException(unittest.TestCase):
+    """Called inside ``except``: whatever it gets, it must not raise."""
+
+    def test_never_raises(self):
+        from wfg_dwg_layers_plus.core.log import _label, warn_exception
+
+        class DeletedLayer(object):
+            def name(self):
+                raise RuntimeError("wrapped C/C++ object has been deleted")
+
+        class Layer(object):
+            def name(self):
+                return "mur_line"
+
+        self.assertEqual(_label(DeletedLayer()), "?")
+        self.assertEqual(_label(Layer()), "mur_line")
+        self.assertEqual(_label("EPSG:2180"), "EPSG:2180")
+        try:
+            raise ValueError("boom")
+        except ValueError:
+            warn_exception("Warstwa {0}", DeletedLayer())
+            warn_exception("Bez miejsca na argument", Layer())
+            warn_exception("Zły {1} znacznik", Layer())
 
 
 class TestColorSplit(unittest.TestCase):

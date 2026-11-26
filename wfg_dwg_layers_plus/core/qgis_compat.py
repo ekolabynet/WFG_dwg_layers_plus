@@ -55,7 +55,7 @@ def render_unit(name):
         from qgis.core import Qgis
 
         return enum_value(Qgis, "RenderUnit." + name)
-    except Exception:
+    except Exception:  # older QGIS API: next fallback  # nosec B110
         pass
     return enum_value(
         QgsUnitTypes,
@@ -70,7 +70,7 @@ def wkb_type(name):
         from qgis.core import Qgis
 
         return enum_value(Qgis, "WkbType." + name)
-    except Exception:
+    except Exception:  # older QGIS API: next fallback  # nosec B110
         pass
     from qgis.core import QgsWkbTypes
 
@@ -83,7 +83,7 @@ def geometry_type(name):
         from qgis.core import Qgis
 
         return enum_value(Qgis, "GeometryType." + name)
-    except Exception:
+    except Exception:  # older QGIS API: next fallback  # nosec B110
         pass
     from qgis.core import QgsWkbTypes
 
@@ -107,7 +107,7 @@ def field_type(name):
         # QVariant nazywa typy inaczej niz QMetaType: nie ma QVariant.QString,
         # jest QVariant.String (shim Qt6 w QGIS aliasuje ja na QMetaType.Type.QString)
         return enum_value(QVariant, _QVARIANT_NAMES.get(name, name), name)
-    except Exception:
+    except Exception:  # older QGIS API: next fallback  # nosec B110
         pass
     from qgis.PyQt.QtCore import QMetaType
 

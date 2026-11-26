@@ -33,7 +33,7 @@ def _unit_name(value):
         try:
             mod = __import__("qgis.core", fromlist=[holder])
             owner = getattr(mod, holder)
-        except Exception:
+        except Exception:  # diagnostic report: best effort  # nosec B112
             continue
         for attr in dir(owner):
             if attr.startswith("Render") and getattr(owner, attr, None) == value:
@@ -53,7 +53,7 @@ def _dd_report(props, owner_enum=None):
             if prop is None or not prop.isActive():
                 continue
             out.append("        [{0}] {1}".format(key, prop.asExpression()))
-        except Exception:
+        except Exception:  # diagnostic report: best effort  # nosec B112
             continue
     return out
 
@@ -79,16 +79,16 @@ def _symbol_report(symbol, lines):
                     if hasattr(sl, unit_getter):
                         unit = " " + _unit_name(getattr(sl, unit_getter)())
                     desc += "  {0}={1}{2}".format(label, value, unit)
-                except Exception:
+                except Exception:  # diagnostic report: best effort  # nosec B110
                     pass
         try:
             desc += "  color={0}".format(sl.color().name())
-        except Exception:
+        except Exception:  # diagnostic report: best effort  # nosec B110
             pass
         lines.append(desc)
         try:
             lines.extend(_dd_report(sl.dataDefinedProperties()))
-        except Exception:
+        except Exception:  # diagnostic report: best effort  # nosec B110
             pass
 
 
@@ -148,7 +148,7 @@ def run(only_group=None, path=None):
             layer.providerType(), layer.wkbType()))
         try:
             lines.append("   filtr: {0}".format(layer.subsetString() or "(brak)"))
-        except Exception:
+        except Exception:  # diagnostic report: best effort  # nosec B110
             pass
         lines.append("   obiektów: {0}".format(layer.featureCount()))
         lines.append("   CRS: {0}".format(layer.crs().authid() or "(nieokreślony)"))
@@ -168,7 +168,7 @@ def run(only_group=None, path=None):
             lines.append("   etykiety: {0}, włączone: {1}".format(
                 type(labeling).__name__ if labeling else "(brak)",
                 layer.labelsEnabled()))
-        except Exception:
+        except Exception:  # diagnostic report: best effort  # nosec B110
             pass
 
         _field_stats(layer, lines)

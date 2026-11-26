@@ -43,6 +43,7 @@ from . import naming, styler
 from .affine import insert_matrix, minsert_offsets
 from .qgis_compat import field_type, vector_file_writer_action
 from ..i18n import tr
+from .log import warn_exception
 
 #: domyslny limit zagniezdzenia blokow
 MAX_DEPTH = 16
@@ -121,7 +122,7 @@ def _val(feature, name, default=None):
 
         if isinstance(v, QVariant) and v.isNull():
             return default
-    except Exception:
+    except Exception:  # QVariant missing in this Qt binding  # nosec B110
         pass
     return v
 
@@ -274,7 +275,7 @@ def read_top_inserts(gpkg_path, cad_layers=None):
         return []
     expr = S.BASE_FILTER
     if cad_layers:
-        quoted = ", ".join(S.sql_quote(l) for l in cad_layers)
+        quoted = ", ".join(S.sql_quote(name) for name in cad_layers)
         expr = '"{0}" IN ({1}) AND {2}'.format(S.C_LAYER, quoted, expr)
     req = QgsFeatureRequest()
     req.setFilterExpression(expr)
@@ -550,7 +551,7 @@ def _collect_geometry(parts, keep_curves):
                 if g.constGet().hasCurvedSegments():
                     g = QgsGeometry(g.constGet().segmentize())
             except Exception:
-                pass
+                warn_exception(tr("Nie udało się zamienić łuków na odcinki w geometrii bloku"))
             flat.append(g)
         geoms = flat
     try:
@@ -674,7 +675,7 @@ def build_block_layers(
                 errors = []
                 try:
                     errors = list(lyr.dataProvider().errors())
-                except Exception:
+                except Exception:  # the error list is only extra detail  # nosec B110
                     pass
                 result.warnings.append(
                     tr("Nie wszystkie obiekty trafily do warstwy {0}: {1}").format(

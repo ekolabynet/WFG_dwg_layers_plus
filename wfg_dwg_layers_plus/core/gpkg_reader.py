@@ -162,7 +162,7 @@ def inventory(path, feedback=None):
         # --- warstwy CAD ---
         index = {}
         cur = conn.execute(
-            "SELECT name, color, ocolor, flags, linewidth FROM {0}".format(S.T_LAYERS)
+            "SELECT name, color, ocolor, flags, linewidth FROM {0}".format(S.T_LAYERS)  # nosec B608
         )
         for name, color, ocolor, flags, linewidth in cur.fetchall():
             if name is None:
@@ -176,7 +176,7 @@ def inventory(path, feedback=None):
                 continue
             if feedback is not None and feedback.isCanceled():
                 raise GpkgReadError(tr("Przerwano."))
-            sql = "SELECT {0}, COUNT(*) FROM {1} WHERE {2} GROUP BY {0}".format(
+            sql = "SELECT {0}, COUNT(*) FROM {1} WHERE {2} GROUP BY {0}".format(  # nosec B608
                 S.C_LAYER, table, S.BASE_FILTER
             )
             try:
@@ -193,13 +193,13 @@ def inventory(path, feedback=None):
                     index[cad_layer] = info
                 info.counts[table] = int(n)
 
-        inv.layers = sorted(index.values(), key=lambda l: l.name.lower())
+        inv.layers = sorted(index.values(), key=lambda info: info.name.lower())
 
         # --- bloki ---
         if S.T_BLOCKS in present:
             try:
                 rows = conn.execute(
-                    "SELECT DISTINCT name FROM {0} WHERE name IS NOT NULL "
+                    "SELECT DISTINCT name FROM {0} WHERE name IS NOT NULL "  # nosec B608
                     "ORDER BY name".format(S.T_BLOCKS)
                 ).fetchall()
                 inv.block_names = [r[0] for r in rows]
@@ -209,7 +209,7 @@ def inventory(path, feedback=None):
         if S.T_INSERTS in present:
             try:
                 inv.insert_count = conn.execute(
-                    "SELECT COUNT(*) FROM {0} WHERE {1}".format(
+                    "SELECT COUNT(*) FROM {0} WHERE {1}".format(  # nosec B608
                         S.T_INSERTS, S.BASE_FILTER
                     )
                 ).fetchone()[0]
@@ -236,12 +236,12 @@ def _detect_expanded(conn, present):
         return False
     try:
         n_defs = conn.execute(
-            "SELECT COUNT(*) FROM {0}".format(S.T_BLOCKS)
+            "SELECT COUNT(*) FROM {0}".format(S.T_BLOCKS)  # nosec B608
         ).fetchone()[0]
         if not n_defs:
             return False
         n_inserts = conn.execute(
-            "SELECT COUNT(*) FROM {0} WHERE {1}".format(S.T_INSERTS, S.BASE_FILTER)
+            "SELECT COUNT(*) FROM {0} WHERE {1}".format(S.T_INSERTS, S.BASE_FILTER)  # nosec B608
         ).fetchone()[0]
         if not n_inserts:
             return True
@@ -252,7 +252,7 @@ def _detect_expanded(conn, present):
             if t not in present:
                 continue
             n_block_geom += conn.execute(
-                "SELECT COUNT(*) FROM {0} WHERE {1} <> {2}".format(
+                "SELECT COUNT(*) FROM {0} WHERE {1} <> {2}".format(  # nosec B608
                     t, S.C_BLOCK, S.MODEL_SPACE_BLOCK
                 )
             ).fetchone()[0]

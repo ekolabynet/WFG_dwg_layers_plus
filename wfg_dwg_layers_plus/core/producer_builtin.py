@@ -25,6 +25,7 @@ from qgis.PyQt.QtWidgets import (
 
 from . import gpkg_schema as S
 from ..i18n import tr
+from .log import warn_exception
 
 ACTION_NAME = "mActionDwgImport"
 
@@ -83,13 +84,13 @@ def preset_block_mode(block_mode, use_curves=None):
         try:
             settings.setValue(key, flags)
         except Exception:
-            pass
+            warn_exception(tr("Nie udało się zapisać ustawienia importu QGIS {0}"), key)
     if use_curves is not None:
         for key in _CURVES_KEYS:
             try:
                 settings.setValue(key, bool(use_curves))
             except Exception:
-                pass
+                warn_exception(tr("Nie udało się zapisać ustawienia importu QGIS {0}"), key)
 
 
 def free_gpkg_path(path):
@@ -159,7 +160,10 @@ class _AutoDriver(object):
                 for w in dlg.findChildren(QgsProjectionSelectionWidget):
                     w.setCrs(QgsCoordinateReferenceSystem(self.crs_authid))
             except Exception:  # noqa: BLE001
-                pass
+                warn_exception(
+                    tr("Nie udało się ustawić układu współrzędnych {0} w oknie importu QGIS"),
+                    self.crs_authid,
+                )
         btn = None
         for b in dlg.findChildren(QAbstractButton):
             if "importdrawing" in b.objectName().lower():
@@ -246,12 +250,12 @@ def _cleanup(project, root, before_nodes, new_ids):
             try:
                 root.removeChildNode(node)
             except Exception:
-                pass
+                warn_exception(tr("Nie udało się usunąć warstw dodanych przez wbudowany import"))
     if new_ids:
         try:
             project.removeMapLayers(new_ids)
         except Exception:
-            pass
+            warn_exception(tr("Nie udało się usunąć warstw dodanych przez wbudowany import"))
 
 
 def _guess_from_settings():
@@ -259,7 +263,7 @@ def _guess_from_settings():
     for key in _DB_KEYS:
         try:
             value = settings.value(key)
-        except Exception:
+        except Exception:  # unreadable setting: try the next key  # nosec B112
             continue
         if value and str(value).lower().endswith(".gpkg") and os.path.exists(str(value)):
             return str(value)

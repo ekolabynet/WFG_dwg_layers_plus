@@ -126,7 +126,7 @@ def run(config, iface=None, feedback=None, progress_cb=None):
     # Pusta lista = "uzytkownik nie wybieral" (np. import prosto z DWG, gdzie
     # wyboru dokonuje wbudowany dialog). Okno pilnuje, zeby swiadome odznaczenie
     # wszystkiego nie trafilo tutaj jako "wszystko".
-    cad_layers = config.cad_layers or [l.name for l in inv.non_empty()]
+    cad_layers = config.cad_layers or [info.name for info in inv.non_empty()]
 
     materialized = None
     if config.tree.layer_mode == S.LayerMode.MATERIALIZE:

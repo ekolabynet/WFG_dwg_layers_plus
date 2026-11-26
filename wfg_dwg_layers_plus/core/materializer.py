@@ -18,6 +18,7 @@ from . import gpkg_schema as S
 from . import gpkg_reader, naming
 from .qgis_compat import vector_file_writer_action
 from ..i18n import tr
+from .log import warn_exception
 
 
 class MaterializeResult(object):
@@ -101,7 +102,7 @@ def materialize(
             try:
                 opts.overrideGeometryType = _linear_type(src.wkbType())
             except Exception:
-                pass
+                warn_exception(tr("Nie udało się wymusić geometrii bez łuków; łuki mogą zostać w tabeli"))
         if feedback is not None:
             opts.feedback = feedback
 
@@ -188,7 +189,7 @@ def read_mapping(gpkg_path):
         return {}
     try:
         rows = conn.execute(
-            "SELECT cad_layer, source_table, table_name FROM {0}".format(S.MAP_TABLE)
+            "SELECT cad_layer, source_table, table_name FROM {0}".format(S.MAP_TABLE)  # nosec B608
         ).fetchall()
         return {(cad, src): tbl for cad, src, tbl in rows}
     except sqlite3.Error:

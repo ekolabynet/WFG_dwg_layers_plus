@@ -7,6 +7,6 @@ OUT="wfg_dwg_layers_plus-v${VER}.zip"
 rm -f "$OUT"
 # plugins.qgis.org wants a README inside the package: the repository README goes in at build time
 cp README.md wfg_dwg_layers_plus/README.md
-zip -r -q "$OUT" wfg_dwg_layers_plus -x '*/__pycache__/*' '*.pyc'
+zip -r -q "$OUT" wfg_dwg_layers_plus -x '*/__pycache__/*' '*.pyc' '*/.pytest_cache/*'
 rm -f wfg_dwg_layers_plus/README.md
 echo "$OUT"

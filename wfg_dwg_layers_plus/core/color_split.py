@@ -32,6 +32,7 @@ except ImportError:  # pragma: no cover — Python 2
 
 from . import gpkg_schema as S
 from ..i18n import tr
+from .log import warn_exception
 
 #: nazwy typów encji, które w praktyce warto rozdzielić
 ETYPE_NAMES = {
@@ -193,9 +194,10 @@ def candidate_layers(gpkg_path, min_colors=2):
         for table in SPLITTABLE:
             try:
                 rows = conn.execute(
-                    'SELECT "{0}", COUNT(DISTINCT "{1}"), COUNT(*) FROM "{2}" '
-                    "WHERE {3} GROUP BY \"{0}\"".format(
-                        S.C_LAYER, S.C_COLOR, table, S.BASE_FILTER
+                    "SELECT {0}, COUNT(DISTINCT {1}), COUNT(*) FROM {2} "  # nosec B608
+                    "WHERE {3} GROUP BY {0}".format(
+                        S.sql_ident(S.C_LAYER), S.sql_ident(S.C_COLOR),
+                        S.sql_ident(table), S.BASE_FILTER
                     )
                 ).fetchall()
             except sqlite3.Error:
@@ -242,8 +244,9 @@ def scan(gpkg_path, cad_layer, tables=None, by_color=True,
                 cols = ["NULL"]
             group = [c for c in cols if c != "NULL"]
 
-            sql = 'SELECT {0}, COUNT(*) FROM "{1}" WHERE {2}'.format(
-                ", ".join(cols), table, S.layer_filter(cad_layer)
+            # columns: fixed names quoted above; CAD layer: sql_quote in layer_filter
+            sql = "SELECT {0}, COUNT(*) FROM {1} WHERE {2}".format(  # nosec B608
+                ", ".join(cols), S.sql_ident(table), S.layer_filter(cad_layer)
             )
             if group:
                 sql += " GROUP BY " + ", ".join(group)
@@ -359,7 +362,7 @@ def build_layers(gpkg_path, cad_layer, buckets, tree_options,
         try:
             styler.apply_swatch(layer, bucket.qcolor())
         except Exception:
-            pass
+            warn_exception(tr("Nie udało się ustawić koloru w legendzie warstwy {0}"), layer)
         kind = S.TABLE_KIND.get(bucket.table, S.KIND_LINE)
         pending.append((grupy[kind], layer, kind))
 
@@ -389,7 +392,7 @@ def remove_source_layers(gpkg_path, cad_layer, project=None):
         try:
             if layer.subsetString().strip() == cel:
                 do_usuniecia.append(layer.id())
-        except Exception:
+        except Exception:  # a layer without a readable filter is not ours  # nosec B112
             continue
     if do_usuniecia:
         project.removeMapLayers(do_usuniecia)

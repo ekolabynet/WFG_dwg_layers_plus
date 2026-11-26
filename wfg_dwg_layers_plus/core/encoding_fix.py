@@ -31,6 +31,8 @@ import re
 import shutil
 import sqlite3
 from ..i18n import tr
+from .log import warn_exception
+from .gpkg_schema import sql_ident
 
 #: znaki, które w praktyce pojawiają się tylko w uszkodzonym tekście.
 #: Bez tego testu zwykły, poprawny napis mógłby przypadkiem przejść przez
@@ -148,7 +150,7 @@ class ScanResult(object):
 
 def _text_columns(conn, table):
     try:
-        info = conn.execute('PRAGMA table_info("{0}")'.format(table)).fetchall()
+        info = conn.execute("PRAGMA table_info({0})".format(sql_ident(table))).fetchall()
     except sqlite3.Error:
         return []
     out = []
@@ -181,8 +183,8 @@ def scan_gpkg(path, encoding=DEFAULT_ENCODING, sample_limit=3, feedback=None):
             for column in _text_columns(conn, table):
                 try:
                     cur = conn.execute(
-                        'SELECT "{0}" FROM "{1}" WHERE "{0}" IS NOT NULL'.format(
-                            column, table
+                        "SELECT {0} FROM {1} WHERE {0} IS NOT NULL".format(  # nosec B608
+                            sql_ident(column), sql_ident(table)
                         )
                     )
                 except sqlite3.Error:
@@ -241,8 +243,8 @@ def apply_gpkg(path, encoding=DEFAULT_ENCODING, make_backup=True,
             for column in _text_columns(conn, table):
                 try:
                     cur = conn.execute(
-                        'SELECT rowid, "{0}" FROM "{1}" WHERE "{0}" IS NOT NULL'.format(
-                            column, table
+                        "SELECT rowid, {0} FROM {1} WHERE {0} IS NOT NULL".format(  # nosec B608
+                            sql_ident(column), sql_ident(table)
                         )
                     )
                 except sqlite3.Error:
@@ -257,7 +259,9 @@ def apply_gpkg(path, encoding=DEFAULT_ENCODING, make_backup=True,
                 if not updates:
                     continue
                 conn.executemany(
-                    'UPDATE "{0}" SET "{1}" = ? WHERE rowid = ?'.format(table, column),
+                    "UPDATE {0} SET {1} = ? WHERE rowid = ?".format(  # nosec B608
+                        sql_ident(table), sql_ident(column)
+                    ),
                     updates,
                 )
                 changed += len(updates)
@@ -336,6 +340,7 @@ def apply_project(project=None, encoding=DEFAULT_ENCODING, fix_filters=True):
             try:
                 subset = layer.subsetString()
             except Exception:
+                warn_exception(tr("Nie udało się odczytać filtra warstwy {0}"), layer)
                 continue
             if not subset:
                 continue
@@ -398,6 +403,7 @@ def release_layers(gpkg_path, project=None):
             layer.reload()
             released += 1
         except Exception:
+            warn_exception(tr("Nie udało się przeładować warstwy {0}"), layer)
             continue
     return released
 
@@ -409,14 +415,15 @@ def reload_layers(gpkg_path=None, project=None):
     project = project or QgsProject.instance()
     layers = (
         layers_on_gpkg(gpkg_path, project) if gpkg_path
-        else [l for l in project.mapLayers().values()
-              if isinstance(l, QgsVectorLayer)]
+        else [lyr for lyr in project.mapLayers().values()
+              if isinstance(lyr, QgsVectorLayer)]
     )
     for layer in layers:
         try:
             layer.reload()
             layer.triggerRepaint()
         except Exception:
+            warn_exception(tr("Nie udało się przeładować warstwy {0}"), layer)
             continue
     return len(layers)
 

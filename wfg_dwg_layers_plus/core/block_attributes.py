@@ -256,12 +256,12 @@ def scan(dxf_path, feedback=None, progress_cb=None, block_filter=None,
         if not had_exceptions:
             try:
                 gdal.DontUseExceptions()
-            except Exception:
+            except Exception:  # restoring the GDAL exception mode  # nosec B110
                 pass
         if not had_ogr_exceptions:
             try:
                 ogr.DontUseExceptions()
-            except Exception:
+            except Exception:  # restoring the GDAL exception mode  # nosec B110
                 pass
 
     if progress_cb is not None:
@@ -422,12 +422,12 @@ def write_table(gpkg_path, scan_result, columns, feedback=None):
         if not had_exceptions:
             try:
                 gdal.DontUseExceptions()
-            except Exception:
+            except Exception:  # restoring the GDAL exception mode  # nosec B110
                 pass
         if not had_ogr_exceptions:
             try:
                 ogr.DontUseExceptions()
-            except Exception:
+            except Exception:  # restoring the GDAL exception mode  # nosec B110
                 pass
 
 

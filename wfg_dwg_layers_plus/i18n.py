@@ -21,7 +21,7 @@ def _qgis_locale():
         loc = QgsApplication.translation() or ""
         if loc:
             return loc
-    except Exception:
+    except Exception:  # next source of the language  # nosec B110
         pass
     try:
         from qgis.core import QgsSettings
@@ -30,14 +30,14 @@ def _qgis_locale():
         user = str(settings.value("locale/userLocale", "") or "")
         if override and user:
             return user
-    except Exception:
+    except Exception:  # next source of the language  # nosec B110
         pass
     try:
         from qgis.core import QgsApplication
         loc = QgsApplication.locale() or ""
         if loc:
             return loc
-    except Exception:
+    except Exception:  # next source of the language  # nosec B110
         pass
     try:
         from qgis.PyQt.QtCore import QLocale

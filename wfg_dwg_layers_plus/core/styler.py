@@ -36,6 +36,7 @@ from .qgis_compat import (
     symbol_property,
 )
 from ..i18n import tr
+from .log import warn_exception
 
 
 class StyleOptions(object):
@@ -278,7 +279,7 @@ def _marker_shape(name):
         from qgis.core import Qgis
 
         return enum_value(Qgis, "MarkerShape." + name)
-    except Exception:
+    except Exception:  # older QGIS API: next fallback  # nosec B110
         pass
     try:
         from qgis.core import QgsSimpleMarkerSymbolLayerBase
@@ -286,7 +287,7 @@ def _marker_shape(name):
         return enum_value(
             QgsSimpleMarkerSymbolLayerBase, "Shape." + name, name
         )
-    except Exception:
+    except Exception:  # older QGIS API: next fallback  # nosec B110
         pass
     return enum_value(QgsSimpleMarkerSymbolLayer, "Shape." + name, name)
 
@@ -304,7 +305,7 @@ def _marker(size_mm, shape="Circle", color=None, stroke=True):
     try:
         sl.setShape(_marker_shape(shape))
     except Exception:
-        pass
+        warn_exception(tr("Nie udało się ustawić kształtu znaku {0}"), shape)
     sl.setSize(float(size_mm))
     sl.setSizeUnit(render_unit("Millimeters"))
     filled = shape not in _UNFILLED_SHAPES
@@ -374,7 +375,7 @@ def _no_geometry_flag():
         from qgis.core import Qgis
 
         return enum_value(Qgis, "FeatureRequestFlag.NoGeometry")
-    except Exception:
+    except Exception:  # older QGIS API: next fallback  # nosec B110
         pass
     return enum_value(QgsFeatureRequest, "Flag.NoGeometry", "NoGeometry")
 
@@ -402,7 +403,7 @@ def sample_color(layer, limit=SWATCH_SAMPLE):
         request.setSubsetOfAttributes([idx])
         try:
             request.setFlags(_no_geometry_flag())
-        except Exception:
+        except Exception:  # without the flag the request also reads geometry  # nosec B110
             pass
         counts = Counter()
         for feature in layer.getFeatures(request):
@@ -446,12 +447,12 @@ def _apply_swatch(layer, color):
             # setColor jest swiadomy rodzaju symbolu: dla wypelnien ustawia
             # wypelnienie, dla linii pisak, dla markerow bez wypelnienia obrys
             clone.symbolLayer(i).setColor(color)
-        except Exception:
+        except Exception:  # symbol layer without a colour  # nosec B112
             continue
     try:
         renderer.setSymbol(clone)
     except Exception:
-        pass
+        warn_exception(tr("Nie udało się podmienić symbolu w legendzie"))
 
 
 #: publiczny alias — miniatura w legendzie z gotowego koloru, bez probkowania

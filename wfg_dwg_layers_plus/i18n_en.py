@@ -628,4 +628,30 @@ EN = {
         'The own import via GDAL explodes blocks into geometry. Choose “Exploded into geometry” or the built-in QGIS import.',
     'Pokaż okno wbudowanego importu QGIS (zatwierdzam sam; bez tego wypełnia się i zamyka automatycznie)':
         'Show the built-in QGIS import window (I confirm it myself; otherwise it fills in and closes automatically)',
+    'Nie udało się zamienić łuków na odcinki w geometrii bloku':
+        'Could not convert arcs to segments in a block geometry',
+    'Nie udało się ustawić koloru w legendzie warstwy {0}':
+        'Could not set the legend colour of layer {0}',
+    'Nie udało się odczytać filtra warstwy {0}':
+        'Could not read the filter of layer {0}',
+    'Nie udało się przeładować warstwy {0}':
+        'Could not reload layer {0}',
+    'Nie udało się wymusić geometrii bez łuków; łuki mogą zostać w tabeli':
+        'Could not force a geometry type without arcs; arcs may stay in the table',
+    'Nie udało się zapisać ustawienia importu QGIS {0}':
+        'Could not save the QGIS import setting {0}',
+    'Nie udało się ustawić układu współrzędnych {0} w oknie importu QGIS':
+        'Could not set the coordinate reference system {0} in the QGIS import window',
+    'Nie udało się usunąć warstw dodanych przez wbudowany import':
+        'Could not remove the layers added by the built-in import',
+    'Nie udało się ustawić kształtu znaku {0}':
+        'Could not set the marker shape {0}',
+    'Nie udało się podmienić symbolu w legendzie':
+        'Could not replace the legend symbol',
+    'Nie udało się odświeżyć warstw na mapie':
+        'Could not refresh the layers on the map',
+    'Nie udało się odświeżyć legendy':
+        'Could not refresh the legend',
+    'Nie udało się przenieść ustawień z poprzedniej nazwy wtyczki':
+        'Could not move the settings from the previous plugin name',
 }

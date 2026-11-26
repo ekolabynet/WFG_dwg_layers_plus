@@ -306,8 +306,9 @@ def plan(gpkg_path, scan, tables=None, sample=6, skip_block_content=True):
             diff = TableDiff(table)
             try:
                 rows = conn.execute(
-                    'SELECT "{0}", "{1}" FROM "{2}" WHERE {3}'.format(
-                        S.C_HANDLE, S.C_LAYER, table, S.BASE_FILTER
+                    "SELECT {0}, {1} FROM {2} WHERE {3}".format(  # nosec B608
+                        S.sql_ident(S.C_HANDLE), S.sql_ident(S.C_LAYER),
+                        S.sql_ident(table), S.BASE_FILTER
                     )
                 ).fetchall()
             except sqlite3.Error:
@@ -439,14 +440,15 @@ def apply_fix(gpkg_path, scan, tables=None, make_backup=True,
                 # dokladnie ten, dla ktorego ta naprawa istnieje — zostalby
                 # po cichu pominiety
                 kursor = conn.execute(
-                    'UPDATE "{0}" SET "{1}" = ('
+                    "UPDATE {0} SET {1} = ("  # nosec B608
                     "  SELECT layer FROM dwgplus_handles h "
-                    '  WHERE h.handle = "{0}"."{2}") '
+                    "  WHERE h.handle = {0}.{2}) "
                     "WHERE {3} AND EXISTS ("
                     "  SELECT 1 FROM dwgplus_handles h "
-                    '  WHERE h.handle = "{0}"."{2}" '
-                    '        AND h.layer IS NOT "{0}"."{1}")'
-                    .format(table, S.C_LAYER, S.C_HANDLE, S.BASE_FILTER)
+                    "  WHERE h.handle = {0}.{2} "
+                    "        AND h.layer IS NOT {0}.{1})"
+                    .format(S.sql_ident(table), S.sql_ident(S.C_LAYER),
+                            S.sql_ident(S.C_HANDLE), S.BASE_FILTER)
                 )
                 zmian += kursor.rowcount if kursor.rowcount > 0 else 0
             except sqlite3.Error as exc:
@@ -487,7 +489,7 @@ def source_drawing(gpkg_path):
         conn = None
     if conn is not None:
         try:
-            for row in conn.execute('SELECT * FROM "{0}"'.format(S.T_DRAWING)):
+            for row in conn.execute("SELECT * FROM {0}".format(S.sql_ident(S.T_DRAWING))):  # nosec B608
                 for wartosc in row:
                     if isinstance(wartosc, bytes):
                         wartosc = _decode(wartosc)
